@@ -434,6 +434,8 @@ def predict_for(model, parameters,
             U_l.loc[0,:] = 0.
 
         root_to_leaf = nx.shortest_path(area_hierarchy, root_area, l)
+        print(root_to_leaf)
+        
         for node in root_to_leaf[1:]:
             if node not in U_l.columns:
                 ## Add a columns U_l[node] = rnormal(0, appropriate_tau)

@@ -24,6 +24,7 @@ import pymc as mc
 
 
 def asr(model, data_type, iter=2000, burn=1000, thin=1, tune_interval=100, verbose=False):
+    # Age specific rate
     """ Fit data model for one epidemiologic parameter using MCMC
 
     :Parameters:
