@@ -1,0 +1,84 @@
+                                                       type  \
+parent_similarity_value_constrained_mu_age_p      Potential   
+p_obs_p                                          Stochastic   
+gamma_p_30                                           Normal   
+gamma_p_100                                          Normal   
+gamma_p_80                                           Normal   
+gamma_p_0                                            Normal   
+gamma_p_60                                           Normal   
+gamma_p_45                                           Normal   
+beta_p_x_cv_ascertainment                            Normal   
+beta_p_x_sex                                         Normal   
+beta_p_x_cv_representative                           Normal   
+beta_p_x_cv_diagnostic_criteria                      Normal   
+eta_p                                               Uniform   
+smooth_mu_p                                       Potential   
+mu_age_derivative_potential_p                     Potential   
+sigma_alpha_p_0                                  Stochastic   
+sigma_alpha_p_4                                  Stochastic   
+sigma_alpha_p_3                                  Stochastic   
+sigma_alpha_p_2                                  Stochastic   
+sigma_alpha_p_1                                  Stochastic   
+alpha_p_PRT                                          Normal   
+alpha_p_SWE                                          Normal   
+alpha_p_DEU                                          Normal   
+alpha_p_GBR                                          Normal   
+alpha_p_NOR                                          Normal   
+alpha_p_ITA                                          Normal   
+alpha_p_AUT                                          Normal   
+alpha_p_NLD                                          Normal   
+alpha_p_FRA                                          Normal   
+alpha_p_ISR                                          Normal   
+alpha_p_FIN                                          Normal   
+alpha_p_DNK                                          Normal   
+alpha_p_ESP                                          Normal   
+covariate_constraint_p                            Potential   
+mu_interval_p                                 Deterministic   
+p_pred_p                                      Deterministic   
+delta_p                                       Deterministic   
+mu_age_p                                      Deterministic   
+value_constrained_mu_age_p                    Deterministic   
+pi_p                                          Deterministic   
+
+                                                           value         logp  
+parent_similarity_value_constrained_mu_age_p                 NaN -2.18335e+06  
+p_obs_p                                                 0.0, ...     -7948.45  
+gamma_p_30                                                 -10.0     -3.72152  
+gamma_p_100                                                -10.0     -3.72152  
+gamma_p_80                                                 -10.0     -3.72152  
+gamma_p_0                                                  -10.0     -3.72152  
+gamma_p_60                                                 -10.0     -3.72152  
+gamma_p_45                                                 -10.0     -3.72152  
+beta_p_x_cv_ascertainment                                    0.0    -0.918939  
+beta_p_x_sex                                                 0.0    -0.918939  
+beta_p_x_cv_representative                                   0.0    -0.918939  
+beta_p_x_cv_diagnostic_criteria                              0.0    -0.918939  
+eta_p                                         1.0986122886681098    -0.787195  
+smooth_mu_p                                                  NaN    -0.225791  
+mu_age_derivative_potential_p                                NaN           -0  
+sigma_alpha_p_0                                              0.1      1.19873  
+sigma_alpha_p_4                                              0.1      1.19873  
+sigma_alpha_p_3                                              0.1      1.19873  
+sigma_alpha_p_2                                              0.1      1.19873  
+sigma_alpha_p_1                                              0.1      1.19873  
+alpha_p_PRT                                                  0.0      1.38365  
+alpha_p_SWE                                                  0.0      1.38365  
+alpha_p_DEU                                                  0.0      1.38365  
+alpha_p_GBR                                                  0.0      1.38365  
+alpha_p_NOR                                                  0.0      1.38365  
+alpha_p_ITA                                                  0.0      1.38365  
+alpha_p_AUT                                                  0.0      1.38365  
+alpha_p_NLD                                                  0.0      1.38365  
+alpha_p_FRA                                                  0.0      1.38365  
+alpha_p_ISR                                                  0.0      1.38365  
+alpha_p_FIN                                                  0.0      1.38365  
+alpha_p_DNK                                                  0.0      1.38365  
+alpha_p_ESP                                                  0.0      1.38365  
+covariate_constraint_p                                       NaN      25.7931  
+mu_interval_p                                           0.0, ...          NaN  
+p_pred_p                                                0.0, ...          NaN  
+delta_p                                                 3.0, ...          NaN  
+mu_age_p                                                0.0, ...          NaN  
+value_constrained_mu_age_p                              0.0, ...          NaN  
+pi_p                                                    0.0, ...          NaN  
+keys: p

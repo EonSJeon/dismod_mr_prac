@@ -22,10 +22,19 @@ import scipy.interpolate
 import dismod_mr
 
 
-def age_specific_rate(model, data_type, reference_area='all', reference_sex='total', reference_year='all',
-                      mu_age=None, mu_age_parent=None, sigma_age_parent=None,
-                      rate_type='neg_binom', lower_bound=None, interpolation_method='linear',
-                      include_covariates=True, zero_re=False):
+def age_specific_rate(model, 
+                      data_type, 
+                      reference_area='all', 
+                      reference_sex='total', 
+                      reference_year='all',
+                      mu_age=None, 
+                      mu_age_parent=None, 
+                      sigma_age_parent=None,
+                      rate_type='neg_binom', 
+                      lower_bound=None, 
+                      interpolation_method='linear',
+                      include_covariates=True, 
+                      zero_re=False):
     # TODO: expose (and document) interface for alternative rate_type as well as other options,
     # record reference values in the model
     """ Generate PyMC objects for model of epidemological age-interval data
@@ -47,6 +56,7 @@ def age_specific_rate(model, data_type, reference_area='all', reference_sex='tot
       - Returns dict of PyMC objects, including 'pi', the covariate adjusted predicted values for each row of data
 
     """
+
     name = data_type
     result = dismod_mr.data.ModelVars()
 

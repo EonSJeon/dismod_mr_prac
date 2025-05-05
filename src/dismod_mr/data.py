@@ -51,24 +51,31 @@ def my_stats(self, alpha=0.05, start=0, batches=100,
 
 def describe_vars(d):
     m = mc.Model(d)
+    
 
-    df = pd.DataFrame(columns=['type', 'value', 'logp'],
-                          index=[n.__name__ for n in m.nodes],
-                          dtype=object)
+    df = pd.DataFrame(
+        columns=['type', 'value', 'logp'],
+        index=[n.__name__ for n in m.nodes],
+        dtype=object
+    )
+
     for n in m.nodes:
         k = n.__name__
-        df.ix[k, 'type'] = type(n).__name__
+        # .ix 대신 .loc 사용
+        df.loc[k, 'type'] = type(n).__name__
 
         if hasattr(n, 'value'):
             rav = pl.ravel(n.value)
             if len(rav) == 1:
-                df.ix[k, 'value'] = n.value
+                df.loc[k, 'value'] = n.value
             elif len(rav) > 1:
-                df.ix[k, 'value'] = '%.1f, ...' % rav[0]
+                df.loc[k, 'value'] = '%.1f, ...' % rav[0]
 
-        df.ix[k, 'logp'] = getattr(n, 'logp', pl.nan)
+        df.loc[k, 'logp'] = getattr(n, 'logp', pl.nan)
 
-    return df.sort('logp')
+    # sort_values에 by 인자 명시
+    return df.sort_values(by='logp')
+
 
 
 def check_convergence(vars):
@@ -115,8 +122,8 @@ class ModelVars(dict):
         self.update(d)
         return self
 
-    def __str__(self):
-        return '%s\nkeys: %s' % (describe_vars(self), ', '.join(self.keys()))
+    # def __str__(self):
+    #     return '%s\nkeys: %s' % (describe_vars(self), ', '.join(self.keys()))
 
     def describe(self):
         print(describe_vars(self))

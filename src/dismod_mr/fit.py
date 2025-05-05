@@ -36,6 +36,7 @@ def asr(model, data_type, iter=2000, burn=1000, thin=1, tune_interval=100, verbo
       - `tune_interval` : int
       - `verbose` : boolean
 
+    
     :Results:
       - returns a pymc.MCMC object created from vars, that has been fit with MCMC
 
@@ -233,6 +234,7 @@ try:
 except ImportError:
     pass
 def print_mare(vars):
+    # Median absolute relative error
     if 'p_obs' in vars:
         are = np.atleast_1d(np.absolute((vars['p_obs'].value - vars['pi'].value)/vars['pi'].value))
         print('mare:', np.round_(np.median(are), 2))
@@ -252,9 +254,14 @@ def find_consistent_spline_initial_vals(vars, method, tol, verbose):
     ## generate initial value by fitting knots sequentially
     vars_to_fit = [vars['logit_C0']]
     for t in param_types:
-        vars_to_fit += [vars[t].get('covariate_constraint'),
-                        vars[t].get('mu_age_derivative_potential'), vars[t].get('mu_sim'),
-                        vars[t].get('p_obs'), vars[t].get('parent_similarity'), vars[t].get('smooth_gamma'),]
+        vars_to_fit += [
+            vars[t].get('mu_age_derivative_potential'),
+            vars[t].get('mu_sim'),
+            vars[t].get('p_obs'),
+            vars[t].get('parent_similarity'),
+            vars[t].get('smooth_gamma'),
+            vars[t].get('covariate_constraint'),
+        ]
     max_knots = max([len(vars[t]['gamma']) for t in 'irf'])
     for i in [max_knots]: #range(1, max_knots+1):
         if verbose:
@@ -270,6 +277,7 @@ def find_consistent_spline_initial_vals(vars, method, tol, verbose):
 
 
 def find_asr_initial_vals(vars, method, tol, verbose):
+    # 이렇게 “스플라인 → 랜덤 효과 → 스플라인 → 고정 효과 → 스플라인 → 분산 …” 순서로 여러 번 MAP 최적화(mc.MAP(vars_to_fit).fit(...))를 반복하여 초기값을 찾는다.
     for outer_reps in range(3):
         find_spline_initial_vals(vars, method, tol, verbose)
         find_re_initial_vals(vars, method, tol, verbose)
@@ -281,8 +289,14 @@ def find_asr_initial_vals(vars, method, tol, verbose):
 
 def find_spline_initial_vals(vars, method, tol, verbose):
     ## generate initial value by fitting knots sequentially
-    vars_to_fit = [vars.get('p_obs'), vars.get('pi_sim'), vars.get('smooth_gamma'), vars.get('parent_similarity'),
-                   vars.get('mu_sim'), vars.get('mu_age_derivative_potential'), vars.get('covariate_constraint')]
+    vars_to_fit = [
+        vars.get('p_obs'), 
+        vars.get('pi_sim'), 
+        vars.get('parent_similarity'),
+        vars.get('mu_sim'), 
+        vars.get('mu_age_derivative_potential'), 
+        vars.get('covariate_constraint')
+    ]
 
     for i, n in enumerate(vars['gamma']):
         if verbose:
@@ -293,6 +307,7 @@ def find_spline_initial_vals(vars, method, tol, verbose):
             print_mare(vars)
 
 def find_re_initial_vals(vars, method, tol, verbose):
+    # random effect
     if 'hierarchy' not in vars:
         return
 
@@ -326,6 +341,7 @@ def find_re_initial_vals(vars, method, tol, verbose):
 
 
 def find_fe_initial_vals(vars, method, tol, verbose):
+    # fixed effect
     vars_to_fit = [vars.get('p_obs'), vars.get('pi_sim'), vars.get('smooth_gamma'), vars.get('parent_similarity'),
                    vars.get('mu_sim'), vars.get('mu_age_derivative_potential'), vars.get('covariate_constraint')]
     vars_to_fit += [vars.get('beta')]  # include fixed effects in sequential fit
