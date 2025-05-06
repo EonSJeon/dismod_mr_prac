@@ -303,6 +303,118 @@ class ModelData:
 
         print('kept %d rows of data' % len(self.input_data.index))
 
+    def save(self, path):
+        """ Saves all model data in human-readable files
+
+        :Parameters:
+          - `path` : str, directory to save in
+
+        :Results:
+          - Saves files to specified path, overwritting what was there before
+
+        """
+
+        self.input_data.to_csv(path + '/input_data.csv')
+        self.output_template.to_csv(path + '/output_template.csv')
+        json.dump(self.parameters, open(path + '/parameters.json', 'w'), indent=2)
+        json.dump(dict(nodes=[[n, self.hierarchy.node[n]] for n in sorted(self.hierarchy.nodes())],
+                       edges=[[u, v, self.hierarchy.edge[u][v]] for u,v in sorted(self.hierarchy.edges())]),
+                  open(path + '/hierarchy.json', 'w'), indent=2)
+        json.dump(list(self.nodes_to_fit), open(path + '/nodes_to_fit.json', 'w'), indent=2)
+
+    @staticmethod
+    def load(path):
+        import re, sys, os
+        def load_jsonc(fp):
+            txt = open(fp, encoding='utf-8').read()
+            # 1) strip comments
+            no_comments = re.sub(r'//.*?$|/\*.*?\*/', '', txt, flags=re.MULTILINE | re.DOTALL)
+            # 2) remove trailing commas before } or ]
+            clean = re.sub(r',\s*([}\]])', r'\1', no_comments)
+            try:
+                return json.loads(clean)
+            except json.JSONDecodeError as e:
+                print(f"❌ JSONC parse error in {fp}: {e}", file=sys.stderr)
+                sys.exit(1)
+        
+        def load_any(name):
+            for ext, loader in (('.jsonc', load_jsonc), ('.json', json.load)):
+                fp = os.path.join(path, f"{name}{ext}")
+                if os.path.isfile(fp):
+                    try:
+                        return loader(open(fp, 'r', encoding='utf-8') if ext=='.json' else fp)
+                    except Exception as e:
+                        print(f"❌ Failed to parse {name}{ext}: {e}", file=sys.stderr)
+                        sys.exit(1)
+            print(f"❌ No {name}.jsonc or {name}.json in {path}", file=sys.stderr)
+            sys.exit(1)
+        
+        d = ModelData()
+        d.input_data       = pd.read_csv(os.path.join(path, 'input_data.csv'))
+        d.output_template  = pd.read_csv(os.path.join(path, 'output_template.csv'))
+        d.parameters       = load_any('parameters')
+        hier               = load_any('hierarchy')
+        d.hierarchy.add_nodes_from(hier['nodes'])
+        d.hierarchy.add_edges_from(hier['edges'])
+        d.nodes_to_fit     = load_any('nodes_to_fit')
+        return d
+
+
+    def invalid_precision(self):
+        """ Identify rows of data with invalid precision
+        :Results:
+          - DataFrame of rows with invalid quantification of uncertainty
+
+        """
+        rows = self.input_data.effective_sample_size.isnull() \
+          & self.input_data.standard_error.isnull() \
+          & (self.input_data.lower_ci.isnull() | self.input_data.upper_ci.isnull())
+        return self.input_data[rows]
+
+    def fit(self, how='mcmc', iter=10000, burn=5000, thin=5):
+        """ Fit the model
+        :Parameters:
+          - `how` : str, 'mcmc' or 'map'
+          'mcmc' is slower but provides uncertainty estimates
+          - iter, burn, thin : int
+          mcmc options
+
+        :Notes:
+        This must come after a call to .setup_model.
+        """
+        from . import fit
+
+        if 'rate_type' in self.model_settings:
+            rate_type=self.model_settings['rate_type']
+
+            if how=='mcmc':
+                self.map, self.mcmc = fit.asr(
+                    self, rate_type,
+                    iter=iter, burn=burn, thin=thin)
+            elif how=='map':
+                self.map = mc.MAP(self.vars[rate_type])
+                fit.find_asr_initial_vals(
+                    self.vars[rate_type], 'fmin_powell', tol=1e-3, verbose=0)
+                self.map.fit(method='fmin_powell')
+        elif 'consistent' in self.model_settings:
+            if how=='mcmc':
+                self.map, self.mcmc = fit.consistent(
+                    self,
+                    iter=iter, burn=burn, thin=thin)
+            elif how=='map':
+                raise NotImplementedError('not yet implemented')
+        else:
+            raise NotImplementedError('Need to call .setup_model before calling fit.')
+
+    def predict_for(self, rate_type, area, sex, year):
+        return dismod_mr.model.covariates.predict_for(
+            self, self.parameters[rate_type],
+            'all', 'total', 'all',
+            area, sex, year,
+            1., self.vars[rate_type],
+            self.parameters[rate_type]['level_bounds']['lower'],
+            self.parameters[rate_type]['level_bounds']['upper'])
+
     def set_smoothness(self, rate_type, value):
         """ Set smoothness parameter for age-specific rate function of one type.
 
@@ -466,7 +578,6 @@ class ModelData:
         else: # random effect
             self.parameters[rate_type]['random_effects'][cov] = value
 
-
     def setup_model(self, rate_type=None, rate_model='neg_binom',
                     interpolation_method='linear', include_covariates=True):
         """ Setup PyMC model vars based on current parameters and data
@@ -506,118 +617,6 @@ class ModelData:
         else:
             self.vars = model.consistent(self, rate_type=rate_model)
             self.model_settings['consistent'] = True
-
-    def fit(self, how='mcmc', iter=10000, burn=5000, thin=5):
-        """ Fit the model
-        :Parameters:
-          - `how` : str, 'mcmc' or 'map'
-          'mcmc' is slower but provides uncertainty estimates
-          - iter, burn, thin : int
-          mcmc options
-
-        :Notes:
-        This must come after a call to .setup_model.
-        """
-        from . import fit
-
-        if 'rate_type' in self.model_settings:
-            rate_type=self.model_settings['rate_type']
-
-            if how=='mcmc':
-                self.map, self.mcmc = fit.asr(
-                    self, rate_type,
-                    iter=iter, burn=burn, thin=thin)
-            elif how=='map':
-                self.map = mc.MAP(self.vars[rate_type])
-                fit.find_asr_initial_vals(
-                    self.vars[rate_type], 'fmin_powell', tol=1e-3, verbose=0)
-                self.map.fit(method='fmin_powell')
-        elif 'consistent' in self.model_settings:
-            if how=='mcmc':
-                self.map, self.mcmc = fit.consistent(
-                    self,
-                    iter=iter, burn=burn, thin=thin)
-            elif how=='map':
-                raise NotImplementedError('not yet implemented')
-        else:
-            raise NotImplementedError('Need to call .setup_model before calling fit.')
-
-    def predict_for(self, rate_type, area, sex, year):
-        return dismod_mr.model.covariates.predict_for(
-            self, self.parameters[rate_type],
-            'all', 'total', 'all',
-            area, sex, year,
-            1., self.vars[rate_type],
-            self.parameters[rate_type]['level_bounds']['lower'],
-            self.parameters[rate_type]['level_bounds']['upper'])
-
-    def save(self, path):
-        """ Saves all model data in human-readable files
-
-        :Parameters:
-          - `path` : str, directory to save in
-
-        :Results:
-          - Saves files to specified path, overwritting what was there before
-
-        """
-
-        self.input_data.to_csv(path + '/input_data.csv')
-        self.output_template.to_csv(path + '/output_template.csv')
-        json.dump(self.parameters, open(path + '/parameters.json', 'w'), indent=2)
-        json.dump(dict(nodes=[[n, self.hierarchy.node[n]] for n in sorted(self.hierarchy.nodes())],
-                       edges=[[u, v, self.hierarchy.edge[u][v]] for u,v in sorted(self.hierarchy.edges())]),
-                  open(path + '/hierarchy.json', 'w'), indent=2)
-        json.dump(list(self.nodes_to_fit), open(path + '/nodes_to_fit.json', 'w'), indent=2)
-
-    @staticmethod
-    def load(path):
-        import re, sys, os
-        def load_jsonc(fp):
-            txt = open(fp, encoding='utf-8').read()
-            # 1) strip comments
-            no_comments = re.sub(r'//.*?$|/\*.*?\*/', '', txt, flags=re.MULTILINE | re.DOTALL)
-            # 2) remove trailing commas before } or ]
-            clean = re.sub(r',\s*([}\]])', r'\1', no_comments)
-            try:
-                return json.loads(clean)
-            except json.JSONDecodeError as e:
-                print(f"❌ JSONC parse error in {fp}: {e}", file=sys.stderr)
-                sys.exit(1)
-        
-        def load_any(name):
-            for ext, loader in (('.jsonc', load_jsonc), ('.json', json.load)):
-                fp = os.path.join(path, f"{name}{ext}")
-                if os.path.isfile(fp):
-                    try:
-                        return loader(open(fp, 'r', encoding='utf-8') if ext=='.json' else fp)
-                    except Exception as e:
-                        print(f"❌ Failed to parse {name}{ext}: {e}", file=sys.stderr)
-                        sys.exit(1)
-            print(f"❌ No {name}.jsonc or {name}.json in {path}", file=sys.stderr)
-            sys.exit(1)
-        
-        d = ModelData()
-        d.input_data       = pd.read_csv(os.path.join(path, 'input_data.csv'))
-        d.output_template  = pd.read_csv(os.path.join(path, 'output_template.csv'))
-        d.parameters       = load_any('parameters')
-        hier               = load_any('hierarchy')
-        d.hierarchy.add_nodes_from(hier['nodes'])
-        d.hierarchy.add_edges_from(hier['edges'])
-        d.nodes_to_fit     = load_any('nodes_to_fit')
-        return d
-
-
-    def invalid_precision(self):
-        """ Identify rows of data with invalid precision
-        :Results:
-          - DataFrame of rows with invalid quantification of uncertainty
-
-        """
-        rows = self.input_data.effective_sample_size.isnull() \
-          & self.input_data.standard_error.isnull() \
-          & (self.input_data.lower_ci.isnull() | self.input_data.upper_ci.isnull())
-        return self.input_data[rows]
 
 
 load = ModelData.load

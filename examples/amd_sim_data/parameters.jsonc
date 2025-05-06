@@ -273,41 +273,54 @@
     100
   ],
   "p": {
+    // Age interval during which p is increasing
     "increasing": {
-      "age_start": 30,
-      "age_end": 100
+      "age_start": 30,   // start of increase
+      "age_end":   100   // end of increase
     },
+
+    // Age interval during which p is decreasing
     "decreasing": {
-          "age_start": 0,
-          "age_end": 0
+      "age_start": 0,    // start of decrease
+      "age_end":   0     // end of decrease (none)
     },
-    "fixed_effects": {},
-    "random_effects": {},
+
+    // Model effects (empty by default)
+    "fixed_effects":  { /* no fixed effects defined */ },
+    "random_effects": { /* no random effects defined */ },
+
+    // Allowed bounds for p values
     "level_bounds": {
-      "upper": 1.0,
-      "lower": 0.0
+      "lower": 0.0,      // minimum allowed p
+      "upper": 1.0       // maximum allowed p
     },
+
+    // Absolute maximum of y
     "y_maximum": 1.0,
+
+    // Default p values before and after key ages
     "level_value": {
-      "age_after": 100,
-      "value": "0.0",
-      "age_before": 30
+      "age_before": 30,   // holds before this age
+      "value":       0.0, // p value
+      "age_after":  100   // holds after this age
     },
+
+    // Mesh points used for parameter interpolation
     "parameter_age_mesh": [
-      0,
-      30,
-      45,
-      60,
-      80,
-      100
+      0, 30, 45, 60, 80, 100
     ],
+
+    // Degree of heterogeneity in the model
     "heterogeneity": "Very",
+
+    // Smoothness configuration across ages
     "smoothness": {
-      "age_start": 0,
-      "amount": "Slightly",
-      "age_end": 100
+      "age_start": 0,          // smoothing begins
+      "amount":    "Slightly", // smoothing intensity
+      "age_end":   100         // smoothing ends
     }
   },
+
   "r": {
     "increasing": {
       "age_start": 0,
