@@ -20,6 +20,7 @@ import pandas as pd
 import networkx as nx
 import pymc as mc
 import pylab as pl
+
 try:
     import simplejson as json
 except ImportError:
@@ -571,45 +572,41 @@ class ModelData:
 
     @staticmethod
     def load(path):
-        """ Load all model data
-
-        :Parameters:
-          - `path` : str, directory to save in
-
-        :Results:
-          - ModelData with all input data
-
-        .. note::
-          `path` must contain the following files
-            - :ref:`input_data-label`
-            - :ref:`output_template-label`
-            - :ref:`hierarchy-label`
-            - :ref:`parameters-label`
-            - :ref:`nodes_to_fit-label`
-
-        """
+        import re, sys, os
+        def load_jsonc(fp):
+            txt = open(fp, encoding='utf-8').read()
+            # 1) strip comments
+            no_comments = re.sub(r'//.*?$|/\*.*?\*/', '', txt, flags=re.MULTILINE | re.DOTALL)
+            # 2) remove trailing commas before } or ]
+            clean = re.sub(r',\s*([}\]])', r'\1', no_comments)
+            try:
+                return json.loads(clean)
+            except json.JSONDecodeError as e:
+                print(f"❌ JSONC parse error in {fp}: {e}", file=sys.stderr)
+                sys.exit(1)
+        
+        def load_any(name):
+            for ext, loader in (('.jsonc', load_jsonc), ('.json', json.load)):
+                fp = os.path.join(path, f"{name}{ext}")
+                if os.path.isfile(fp):
+                    try:
+                        return loader(open(fp, 'r', encoding='utf-8') if ext=='.json' else fp)
+                    except Exception as e:
+                        print(f"❌ Failed to parse {name}{ext}: {e}", file=sys.stderr)
+                        sys.exit(1)
+            print(f"❌ No {name}.jsonc or {name}.json in {path}", file=sys.stderr)
+            sys.exit(1)
+        
         d = ModelData()
-
-        # TODO: catch _csv.Error and retry, to give j drive time to sync
-        d.input_data = pd.read_csv(path + '/input_data.csv')
-
-        # ensure that certain columns are float
-        #for field in 'value standard_error upper_ci lower_ci effective_sample_size'.split():
-        #    #d.input_data.dtypes[field] = float  # TODO: figure out classy way like this, that works
-        #    d.input_data[field] = pl.array(d.input_data[field], dtype=float)
-
-
-        d.output_template = pd.read_csv(path + '/output_template.csv')
-
-        d.parameters = json.load(open(path + '/parameters.json'))
-
-        hierarchy = json.load(open(path + '/hierarchy.json'))
-        d.hierarchy.add_nodes_from(hierarchy['nodes'])
-        d.hierarchy.add_edges_from(hierarchy['edges'])
-
-        d.nodes_to_fit = json.load(open(path + '/nodes_to_fit.json'))
-
+        d.input_data       = pd.read_csv(os.path.join(path, 'input_data.csv'))
+        d.output_template  = pd.read_csv(os.path.join(path, 'output_template.csv'))
+        d.parameters       = load_any('parameters')
+        hier               = load_any('hierarchy')
+        d.hierarchy.add_nodes_from(hier['nodes'])
+        d.hierarchy.add_edges_from(hier['edges'])
+        d.nodes_to_fit     = load_any('nodes_to_fit')
         return d
+
 
     def invalid_precision(self):
         """ Identify rows of data with invalid precision

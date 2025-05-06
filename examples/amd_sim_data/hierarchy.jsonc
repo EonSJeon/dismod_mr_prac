@@ -1,0 +1,446 @@
+{
+    "nodes": [
+      // ───────── Root Node ─────────
+      ["all", { "level": 0 }],
+
+      // ───────── Super-Regions (level 1) ─────────
+      ["super-region_0", { "level": 1 }],
+      ["super-region_1", { "level": 1 }],
+      ["super-region_2", { "level": 1 }],
+      ["super-region_3", { "level": 1 }],
+      ["super-region_4", { "level": 1 }],
+      ["super-region_5", { "level": 1 }],
+      ["super-region_6", { "level": 1 }],
+
+      // ───────── Subregions of Super-Region 0 (level 2) ─────────
+      // (High-Income & Australasia)
+      ["asia_pacific_high_income", { "level": 2 }],
+      ["australasia",               { "level": 2 }],
+      ["europe_western",            { "level": 2 }],
+      ["latin_america_southern",    { "level": 2 }],
+      ["north_america_high_income", { "level": 2 }],
+
+      // ───────── Subregions of Super-Region 1 (level 2) ─────────
+      // (Central Europe & Central Asia)
+      ["asia_central",   { "level": 2 }],
+      ["europe_central", { "level": 2 }],
+      ["europe_eastern", { "level": 2 }],
+
+      // ───────── Subregions of Super-Region 2 (level 2) ─────────
+      // (Sub-Saharan Africa)
+      ["sub-saharan_africa_central",  { "level": 2 }],
+      ["sub-saharan_africa_east",     { "level": 2 }],
+      ["sub-saharan_africa_southern", { "level": 2 }],
+      ["sub-saharan_africa_west",     { "level": 2 }],
+
+      // ───────── Subregion of Super-Region 3 (level 2) ─────────
+      // (North Africa & Middle East)
+      ["north_africa_middle_east", { "level": 2 }],
+
+      // ───────── Subregion of Super-Region 4 (level 2) ─────────
+      // (South Asia)
+      ["asia_south", { "level": 2 }],
+
+      // ───────── Subregions of Super-Region 5 (level 2) ─────────
+      // (East & Southeast Asia, Oceania)
+      ["asia_east",      { "level": 2 }],
+      ["asia_southeast", { "level": 2 }],
+      ["oceania",        { "level": 2 }],
+
+      // ───────── Subregions of Super-Region 6 (level 2) ─────────
+      // (Latin America & Caribbean)
+      ["caribbean",              { "level": 2 }],
+      ["latin_america_andean",   { "level": 2 }],
+      ["latin_america_central",  { "level": 2 }],
+      ["latin_america_tropical", { "level": 2 }],
+
+      
+      // ───────── Leaves under Asia Central ─────────
+      ["ARM", { "level": 3, "pop": 9769.935115904684 }],
+      ["AZE", { "level": 3, "pop": 25233.351243492325 }],
+      ["GEO", { "level": 3, "pop": 14474.286246999432 }],
+      ["KAZ", { "level": 3, "pop": 48041.249540951365 }],
+      ["KGZ", { "level": 3, "pop": 14890.88487237191 }],
+      ["MNG", { "level": 3, "pop": 7539.989319358252 }],
+      ["TJK", { "level": 3, "pop": 18735.352084108832 }],
+      ["TKM", { "level": 3, "pop": 13525.678114907325 }],
+      ["UZB", { "level": 3, "pop": 74364.1992428581 }],
+
+      // ───────── Leaves under Europe Central ─────────
+      ["ALB", { "level": 3, "pop": 9680.951456435594 }],
+      ["BIH", { "level": 3, "pop": 11966.337799417131 }],
+      ["BGR", { "level": 3, "pop": 24452.723197940955 }],
+      ["HRV", { "level": 3, "pop": 13538.211461984236 }],
+      ["CZE", { "level": 3, "pop": 31349.040758117575 }],
+      ["HUN", { "level": 3, "pop": 30797.3584744313 }],
+      ["MNE", { "level": 3, "pop": 1859.6576223197458 }],
+      ["POL", { "level": 3, "pop": 115532.27629008851 }],
+      ["ROU", { "level": 3, "pop": 67200.05564603122 }],
+      ["SRB", { "level": 3, "pop": 29685.66795982768 }],
+      ["SVK", { "level": 3, "pop": 16218.832448371792 }],
+      ["SVN", { "level": 3, "pop": 6093.953198530183 }],
+      ["MKD", { "level": 3, "pop": 6064.309982802828 }],
+
+      // ───────── Leaves under Europe Eastern ─────────
+      ["BLR", { "level": 3, "pop": 29880.273135206276 }],
+      ["EST", { "level": 3, "pop": 4297.229373668429 }],
+      ["LVA", { "level": 3, "pop": 7279.058026977356 }],
+      ["LTU", { "level": 3, "pop": 10547.292776088727 }],
+      ["MDA", { "level": 3, "pop": 11853.493726347033 }],
+      ["RUS", { "level": 3, "pop": 436821.60218077165 }],
+      ["UKR", { "level": 3, "pop": 145846.34811927404 }],
+
+      // ───────── Leaves under Asia Pacific High Income ─────────
+      ["BRN", { "level": 3, "pop": 1019.619875217231 }],
+      ["JPN", { "level": 3, "pop": 378211.58248970634 }],
+      ["KOR", { "level": 3, "pop": 139214.43639911522 }],
+      ["SGP", { "level": 3, "pop": 10006.909274505573 }],
+
+      // ───────── Leaves under Australasia ─────────
+      ["AUS", { "level": 3, "pop": 59326.94809451265 }],
+      ["NZL", { "level": 3, "pop": 11971.270238793857 }],
+
+      // ───────── Leaves under Europe Western ─────────
+      ["AUT", { "level": 3, "pop": 24418.2913886072 }],
+      ["BEL", { "level": 3, "pop": 31501.882699129324 }],
+      ["CYP", { "level": 3, "pop": 2154.1916379900367 }],
+      ["DNK", { "level": 3, "pop": 16173.152705496623 }],
+      ["FIN", { "level": 3, "pop": 15721.66990012703 }],
+      ["FRA", { "level": 3, "pop": 181669.63877283392 }],
+      ["DEU", { "level": 3, "pop": 246271.83266521376 }],
+      ["GRC", { "level": 3, "pop": 33113.866890420926 }],
+      ["ISL", { "level": 3, "pop": 878.2870816321907 }],
+      ["IRL", { "level": 3, "pop": 12273.59828739258 }],
+      ["ISR", { "level": 3, "pop": 19289.264789047644 }],
+      ["ITA", { "level": 3, "pop": 176902.02602253816 }],
+      ["LUX", { "level": 3, "pop": 1348.335880727935 }],
+      ["MLT", { "level": 3, "pop": 1202.4844181508158 }],
+      ["NLD", { "level": 3, "pop": 48135.32317384595 }],
+      ["NOR", { "level": 3, "pop": 13772.784289337864 }],
+      ["PRT", { "level": 3, "pop": 31459.828247392783 }],
+      ["ESP", { "level": 3, "pop": 127925.79237229106 }],
+      ["SWE", { "level": 3, "pop": 27006.07628184565 }],
+      ["CHE", { "level": 3, "pop": 21890.84986945575 }],
+      ["GBR", { "level": 3, "pop": 180722.50590925218 }],
+
+      // ───────── Leaves under Latin America Southern ─────────
+      ["ARG", { "level": 3, "pop": 112554.27035786894 }],
+      ["CHL", { "level": 3, "pop": 45516.46982639383 }],
+      ["URY", { "level": 3, "pop": 9892.26609114509 }],
+
+      // ───────── Leaves under North America High Income ─────────
+      ["CAN", { "level": 3, "pop": 93769.75763067881 }],
+      ["USA", { "level": 3, "pop": 856838.9321786632 }],
+
+      // ───────── Leaves under Caribbean ─────────
+      ["ATG", { "level": 3, "pop": 227.5538054655817 }],
+      ["BHS", { "level": 3, "pop": 923.8900496932104 }],
+      ["BRB", { "level": 3, "pop": 809.2823912457926 }],
+      ["BLZ", { "level": 3, "pop": 786.2898936834392 }],
+      ["CUB", { "level": 3, "pop": 33273.80213961909 }],
+      ["DOM", { "level": 3, "pop": 26512.75553659979 }],
+      ["GRD", { "level": 3, "pop": 305.23265868912625 }],
+      ["GUY", { "level": 3, "pop": 2222.639500609071 }],
+      ["HTI", { "level": 3, "pop": 26612.93328764045 }],
+      ["JAM", { "level": 3, "pop": 7854.302363097564 }],
+      ["PRI", { "level": 3, "pop": 3250.000000000000 }],  // placeholder pop
+      ["LCA", { "level": 3, "pop": 481.64016622992057 }],
+      ["VCT", { "level": 3, "pop": 327.4055412981266 }],
+      ["SUR", { "level": 3, "pop": 1433.5549238208234 }],
+      ["TTO", { "level": 3, "pop": 3890.7483401487334 }],
+      ["VIR", { "level": 3, "pop": 104.917000000000 }],  // placeholder pop
+
+      // ───────── Leaves under Latin America Andean ─────────
+      ["BOL", { "level": 3, "pop": 25909.850091972774 }],
+      ["ECU", { "level": 3, "pop": 38335.12127172502 }],
+      ["PER", { "level": 3, "pop": 78771.26184258718 }],
+
+      // ───────── Leaves under Latin America Central ─────────
+      ["COL", { "level": 3, "pop": 123076.76173832016 }],
+      ["CRI", { "level": 3, "pop": 12069.635194621542 }],
+      ["SLV", { "level": 3, "pop": 17659.505949033784 }],
+      ["GTM", { "level": 3, "pop": 36319.60354879778 }],
+      ["HND", { "level": 3, "pop": 19496.468277537617 }],
+      ["MEX", { "level": 3, "pop": 305611.8953083807 }],
+      ["NIC", { "level": 3, "pop": 15404.998584548637 }],
+      ["PAN", { "level": 3, "pop": 9216.19135533801 }],
+      ["VEN", { "level": 3, "pop": 75645.9753384128 }],
+
+      // ───────── Leaves under Latin America Tropical ─────────
+      ["BRA", { "level": 3, "pop": 532546.445046956 }],
+      ["PRY", { "level": 3, "pop": 16698.395088716698 }],
+
+      // ───────── Leaves under North Africa & Middle East ─────────
+      ["AFG", { "level": 3, "pop": 73756.32922095177 }],
+      ["DZA", { "level": 3, "pop": 94182.18936539737 }],
+      ["BHR", { "level": 3, "pop": 2513.5602611623867 }],
+      ["EGY", { "level": 3, "pop": 213420.18197587237 }],
+      ["IRN", { "level": 3, "pop": 199746.65619732442 }],
+      ["IRQ", { "level": 3, "pop": 76922.11498430926 }],
+      ["JOR", { "level": 3, "pop": 14916.965131791305 }],
+      ["KWT", { "level": 3, "pop": 7047.26319888892 }],
+      ["LBN", { "level": 3, "pop": 11331.457816630296 }],
+      ["LBY", { "level": 3, "pop": 16527.59293882076 }],
+      ["MAR", { "level": 3, "pop": 87661.66717378712 }],
+      ["PSE", { "level": 3, "pop": 9758.774323351414 }],
+      ["OMN", { "level": 3, "pop": 7081.496839369662 }],
+      ["QAT", { "level": 3, "pop": 3064.3052579483206 }],
+      ["SAU", { "level": 3, "pop": 67491.23622898011 }],
+      ["SDN", { "level": 3, "pop": 109513.70946684817 }],
+      ["SYR", { "level": 3, "pop": 50884.040119185025 }],
+      ["TUN", { "level": 3, "pop": 28832.442935239065 }],
+      ["TUR", { "level": 3, "pop": 196344.29954761872 }],
+      ["ARE", { "level": 3, "pop": 13396.894203015685 }],
+      ["YEM", { "level": 3, "pop": 57074.72148607738 }],
+
+      // ───────── Leaves under South Asia ─────────
+      ["BGD", { "level": 3, "pop": 396030.9047628056 }],
+      ["BTN", { "level": 3, "pop": 1949.75200213064 }],
+      ["IND", { "level": 3, "pop": 3253684.317695828 }],
+      ["NPL", { "level": 3, "pop": 76639.07925093085 }],
+      ["PAK", { "level": 3, "pop": 447249.5795047635 }],
+
+      // ───────── Leaves under East Asia ─────────
+      ["CHN", { "level": 3, "pop": 3815185.822816711 }],
+      ["PRK", { "level": 3, "pop": 68777.89992090505 }],
+      ["TWN", { "level": 3, "pop": 66734.42783906675 }],
+
+      // ───────── Leaves under Southeast Asia ─────────
+      ["KHM", { "level": 3, "pop": 37317.36732711642 }],
+      ["IDN", { "level": 3, "pop": 654334.0876142898 }],
+      ["LAO", { "level": 3, "pop": 16217.405361750552 }],
+      ["MYS", { "level": 3, "pop": 72869.87197693888 }],
+      ["MDV", { "level": 3, "pop": 834.9666806671129 }],
+      ["MUS", { "level": 3, "pop": 3631.063238670292 }],
+      ["MMR", { "level": 3, "pop": 134358.42868780164 }],
+      ["PHL", { "level": 3, "pop": 241367.82601624774 }],
+      ["SYC", { "level": 3, "pop": 215.35496891242943 }],
+      ["LKA", { "level": 3, "pop": 58371.52776435563 }],
+      ["THA", { "level": 3, "pop": 193638.83229043207 }],
+      ["TLS", { "level": 3, "pop": 2921.4861956940895 }],
+      ["VNM", { "level": 3, "pop": 239791.8199322466 }],
+
+      // ───────── Leaves under Oceania ─────────
+      ["FJI", { "level": 3, "pop": 2434.445591954184 }],
+      ["GUM", { "level": 3, "pop": 172.952000000000 }],
+      ["KIR", { "level": 3, "pop": 253.48306826558724 }],
+      ["MHL", { "level": 3, "pop": 170.88804933011684 }],
+      ["FSM", { "level": 3, "pop": 319.7269723412799 }],
+      ["PNG", { "level": 3, "pop": 17193.759025097792 }],
+      ["WSM", { "level": 3, "pop": 531.2459991356043 }],
+      ["SLB", { "level": 3, "pop": 1332.361439754646 }],
+      ["TON", { "level": 3, "pop": 303.3467914712019 }],
+      ["VUT", { "level": 3, "pop": 601.0066566616839 }]
+    ],
+  
+    "edges": [
+      // ───────── Root to Super-Regions ─────────
+      ["all", "super-region_0", { "weight": NaN }],
+      ["all", "super-region_1", { "weight": NaN }],
+      ["all", "super-region_2", { "weight": NaN }],
+      ["all", "super-region_3", { "weight": NaN }],
+      ["all", "super-region_4", { "weight": NaN }],
+      ["all", "super-region_5", { "weight": NaN }],
+      ["all", "super-region_6", { "weight": NaN }],
+
+      // ───────── Super-Region 0 (High-Income & Australasia) ─────────
+      ["super-region_0", "asia_pacific_high_income", { "weight": NaN }],
+      ["super-region_0", "australasia",                { "weight": NaN }],
+      ["super-region_0", "europe_western",            { "weight": NaN }],
+      ["super-region_0", "latin_america_southern",    { "weight": NaN }],
+      ["super-region_0", "north_america_high_income", { "weight": NaN }],
+
+      // ───────── Super-Region 1 (Central Europe & Central Asia) ─────────
+      ["super-region_1", "asia_central",   { "weight": NaN }],
+      ["super-region_1", "europe_central", { "weight": NaN }],
+      ["super-region_1", "europe_eastern", { "weight": NaN }],
+
+      // ───────── Super-Region 2 (Sub-Saharan Africa) ─────────
+      ["super-region_2", "sub-saharan_africa_central",  { "weight": NaN }],
+      ["super-region_2", "sub-saharan_africa_east",     { "weight": NaN }],
+      ["super-region_2", "sub-saharan_africa_southern", { "weight": NaN }],
+      ["super-region_2", "sub-saharan_africa_west",     { "weight": NaN }],
+
+      // ───────── Super-Region 3 (North Africa & Middle East) ─────────
+      ["super-region_3", "north_africa_middle_east", { "weight": NaN }],
+
+      // ───────── Super-Region 4 (South Asia) ─────────
+      ["super-region_4", "asia_south", { "weight": NaN }],
+
+      // ───────── Super-Region 5 (East & Southeast Asia, Oceania) ─────────
+      ["super-region_5", "asia_east",        { "weight": NaN }],
+      ["super-region_5", "asia_southeast",   { "weight": NaN }],
+      ["super-region_5", "oceania",          { "weight": NaN }],
+
+      // ───────── Super-Region 6 (Latin America & Caribbean) ─────────
+      ["super-region_6", "caribbean",             { "weight": NaN }],
+      ["super-region_6", "latin_america_andean",  { "weight": NaN }],
+      ["super-region_6", "latin_america_central", { "weight": NaN }],
+      ["super-region_6", "latin_america_tropical",{ "weight": NaN }],
+
+      // ───────── Leaves under Super-Region 0 ─────────
+      ["asia_pacific_high_income", "BRN", { "weight": NaN }],
+      ["asia_pacific_high_income", "JPN", { "weight": NaN }],
+      ["asia_pacific_high_income", "KOR", { "weight": NaN }],
+      ["asia_pacific_high_income", "SGP", { "weight": NaN }],
+
+      ["australasia", "AUS", { "weight": NaN }],
+      ["australasia", "NZL", { "weight": NaN }],
+
+      ["europe_western", "AUT", { "weight": NaN }],
+      ["europe_western", "BEL", { "weight": NaN }],
+      ["europe_western", "CYP", { "weight": NaN }],
+      ["europe_western", "DNK", { "weight": NaN }],
+      ["europe_western", "FIN", { "weight": NaN }],
+      ["europe_western", "FRA", { "weight": NaN }],
+      ["europe_western", "DEU", { "weight": NaN }],
+      ["europe_western", "GRC", { "weight": NaN }],
+      ["europe_western", "ISL", { "weight": NaN }],
+      ["europe_western", "IRL", { "weight": NaN }],
+      ["europe_western", "ISR", { "weight": NaN }],
+      ["europe_western", "ITA", { "weight": NaN }],
+      ["europe_western", "LUX", { "weight": NaN }],
+      ["europe_western", "MLT", { "weight": NaN }],
+      ["europe_western", "NLD", { "weight": NaN }],
+      ["europe_western", "NOR", { "weight": NaN }],
+      ["europe_western", "PRT", { "weight": NaN }],
+      ["europe_western", "ESP", { "weight": NaN }],
+      ["europe_western", "SWE", { "weight": NaN }],
+      ["europe_western", "CHE", { "weight": NaN }],
+      ["europe_western", "GBR", { "weight": NaN }],
+
+      ["latin_america_southern", "ARG", { "weight": NaN }],
+      ["latin_america_southern", "CHL", { "weight": NaN }],
+      ["latin_america_southern", "URY", { "weight": NaN }],
+
+      ["north_america_high_income", "CAN", { "weight": NaN }],
+      ["north_america_high_income", "USA", { "weight": NaN }],
+
+      // ───────── Leaves under Super-Region 1 ─────────
+      ["asia_central", "ARM", { "weight": NaN }],
+      ["asia_central", "AZE", { "weight": NaN }],
+      ["asia_central", "GEO", { "weight": NaN }],
+      ["asia_central", "KAZ", { "weight": NaN }],
+      ["asia_central", "KGZ", { "weight": NaN }],
+      ["asia_central", "MNG", { "weight": NaN }],
+      ["asia_central", "TJK", { "weight": NaN }],
+      ["asia_central", "TKM", { "weight": NaN }],
+      ["asia_central", "UZB", { "weight": NaN }],
+
+      ["europe_central", "ALB", { "weight": NaN }],
+      ["europe_central", "BIH", { "weight": NaN }],
+      ["europe_central", "BGR", { "weight": NaN }],
+      ["europe_central", "HRV", { "weight": NaN }],
+      ["europe_central", "CZE", { "weight": NaN }],
+      ["europe_central", "HUN", { "weight": NaN }],
+      ["europe_central", "MNE", { "weight": NaN }],
+      ["europe_central", "POL", { "weight": NaN }],
+      ["europe_central", "ROU", { "weight": NaN }],
+      ["europe_central", "SRB", { "weight": NaN }],
+      ["europe_central", "SVK", { "weight": NaN }],
+      ["europe_central", "SVN", { "weight": NaN }],
+      ["europe_central", "MKD", { "weight": NaN }],
+
+      ["europe_eastern", "BLR", { "weight": NaN }],
+      ["europe_eastern", "EST", { "weight": NaN }],
+      ["europe_eastern", "LVA", { "weight": NaN }],
+      ["europe_eastern", "LTU", { "weight": NaN }],
+      ["europe_eastern", "MDA", { "weight": NaN }],
+      ["europe_eastern", "RUS", { "weight": NaN }],
+      ["europe_eastern", "UKR", { "weight": NaN }],
+
+      // ───────── Leaves under Super-Region 2 ─────────
+      ["sub-saharan_africa_central",  "AGO", { "weight": NaN }],
+      ["sub-saharan_africa_central",  "CAF", { "weight": NaN }],
+      ["sub-saharan_africa_central",  "COD", { "weight": NaN }],
+      ["sub-saharan_africa_central",  "COG", { "weight": NaN }],
+      ["sub-saharan_africa_central",  "GAB", { "weight": NaN }],
+      ["sub-saharan_africa_central",  "GNQ", { "weight": NaN }],
+
+      ["sub-saharan_africa_east",     "BDI", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "COM", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "DJI", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "ERI", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "ETH", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "KEN", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "MDG", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "MOZ", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "MWI", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "RWA", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "SDN", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "SOM", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "TZA", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "UGA", { "weight": NaN }],
+      ["sub-saharan_africa_east",     "ZMB", { "weight": NaN }],
+
+      ["sub-saharan_africa_southern", "BWA", { "weight": NaN }],
+      ["sub-saharan_africa_southern", "LSO", { "weight": NaN }],
+      ["sub-saharan_africa_southern", "NAM", { "weight": NaN }],
+      ["sub-saharan_africa_southern", "SWZ", { "weight": NaN }],
+      ["sub-saharan_africa_southern", "ZAF", { "weight": NaN }],
+      ["sub-saharan_africa_southern", "ZWE", { "weight": NaN }],  
+
+      // ───────── Leaves under Super-Region 3 (North Africa & Middle East) ─────────
+      ["north_africa_middle_east", "AFG", { "weight": NaN }],
+      ["north_africa_middle_east", "DZA", { "weight": NaN }],
+      ["north_africa_middle_east", "BHR", { "weight": NaN }],
+      ["north_africa_middle_east", "EGY", { "weight": NaN }],
+      ["north_africa_middle_east", "IRN", { "weight": NaN }],
+      ["north_africa_middle_east", "IRQ", { "weight": NaN }],
+      ["north_africa_middle_east", "JOR", { "weight": NaN }],
+      ["north_africa_middle_east", "KWT", { "weight": NaN }],
+      ["north_africa_middle_east", "LBN", { "weight": NaN }],
+      ["north_africa_middle_east", "LBY", { "weight": NaN }],
+      ["north_africa_middle_east", "MAR", { "weight": NaN }],
+      ["north_africa_middle_east", "PSE", { "weight": NaN }],
+      ["north_africa_middle_east", "OMN", { "weight": NaN }],
+      ["north_africa_middle_east", "QAT", { "weight": NaN }],
+      ["north_africa_middle_east", "SAU", { "weight": NaN }],
+      ["north_africa_middle_east", "SDN", { "weight": NaN }],
+      ["north_africa_middle_east", "SYR", { "weight": NaN }],
+      ["north_africa_middle_east", "TUN", { "weight": NaN }],
+      ["north_africa_middle_east", "TUR", { "weight": NaN }],
+      ["north_africa_middle_east", "ARE", { "weight": NaN }],
+      ["north_africa_middle_east", "YEM", { "weight": NaN }],
+
+      // ───────── Leaves under Super-Region 4 (South Asia) ─────────
+      ["asia_south", "BGD", { "weight": NaN }],
+      ["asia_south", "BTN", { "weight": NaN }],
+      ["asia_south", "IND", { "weight": NaN }],
+      ["asia_south", "NPL", { "weight": NaN }],
+      ["asia_south", "PAK", { "weight": NaN }],
+
+      // ───────── Leaves under Super-Region 5 (East Asia) ─────────
+      ["asia_east", "CHN", { "weight": NaN }],
+      ["asia_east", "PRK", { "weight": NaN }],
+      ["asia_east", "TWN", { "weight": NaN }],
+
+      // ───────── Leaves under Super-Region 5 (South-East Asia) ─────────
+      ["asia_southeast", "KHM", { "weight": NaN }],
+      ["asia_southeast", "IDN", { "weight": NaN }],
+      ["asia_southeast", "LAO", { "weight": NaN }],
+      ["asia_southeast", "MYS", { "weight": NaN }],
+      ["asia_southeast", "MDV", { "weight": NaN }],
+      ["asia_southeast", "MUS", { "weight": NaN }],
+      ["asia_southeast", "MMR", { "weight": NaN }],
+      ["asia_southeast", "PHL", { "weight": NaN }],
+      ["asia_southeast", "SYC", { "weight": NaN }],
+      ["asia_southeast", "LKA", { "weight": NaN }],
+      ["asia_southeast", "THA", { "weight": NaN }],
+      ["asia_southeast", "TLS", { "weight": NaN }],
+      ["asia_southeast", "VNM", { "weight": NaN }],
+
+      // ───────── Leaves under Super-Region 5 (Oceania) ─────────
+      ["oceania", "FJI", { "weight": NaN }],
+      ["oceania", "GUM", { "weight": NaN }],
+      ["oceania", "KIR", { "weight": NaN }],
+      ["oceania", "MHL", { "weight": NaN }],
+      ["oceania", "FSM", { "weight": NaN }],
+      ["oceania", "PNG", { "weight": NaN }],
+      ["oceania", "WSM", { "weight": NaN }],
+      ["oceania", "SLB", { "weight": NaN }],
+      ["oceania", "TON", { "weight": NaN }],
+      ["oceania", "VUT", { "weight": NaN }],
+    ]
+  }
+  
