@@ -198,6 +198,76 @@ class ModelData:
         else:
             return self.input_data
 
+    def keep(self, areas=['all'], sexes=['male', 'female', 'total'], start_year=-pl.inf, end_year=pl.inf):
+        """ Modify model to feature only desired area/sex/year(s)
+
+        :Parameters:
+          - `areas` : list of str, optional
+          - `sexes` : list of str, optional
+          - `start_year` : int, optional
+          - `end_year` : int, optional
+
+        """
+        if 'all' not in areas:
+            self.hierarchy.remove_node('all')
+            for area in areas:
+                self.hierarchy.add_edge('all', area)
+            self.hierarchy = nx.bfs_tree(self.hierarchy, 'all')
+
+            def relevant_row(i):
+                area = self.input_data['area'][i]
+                return (area in self.hierarchy) or (area == 'all')
+
+            rows = [i for i in self.input_data.index if relevant_row(i)]
+            self.input_data = self.input_data.loc[rows]
+            self.nodes_to_fit = set(self.hierarchy.nodes()) & set(self.nodes_to_fit)
+
+        self.input_data = self.input_data[self.input_data.sex.isin(sexes)]
+
+        self.input_data = self.input_data[self.input_data.year_end >= start_year]
+        self.input_data = self.input_data[self.input_data.year_start <= end_year]
+
+        print('kept %d rows of data' % len(self.input_data.index))
+
+    @staticmethod
+    def load(path):
+        import re, sys, os
+        def load_jsonc(fp):
+            txt = open(fp, encoding='utf-8').read()
+            # 1) strip comments
+            no_comments = re.sub(r'//.*?$|/\*.*?\*/', '', txt, flags=re.MULTILINE | re.DOTALL)
+            # 2) remove trailing commas before } or ]
+            clean = re.sub(r',\s*([}\]])', r'\1', no_comments)
+            try:
+                return json.loads(clean)
+            except json.JSONDecodeError as e:
+                print(f"❌ JSONC parse error in {fp}: {e}", file=sys.stderr)
+                sys.exit(1)
+        
+        def load_any(name):
+            for ext, loader in (('.jsonc', load_jsonc), ('.json', json.load)):
+                fp = os.path.join(path, f"{name}{ext}")
+                if os.path.isfile(fp):
+                    try:
+                        return loader(open(fp, 'r', encoding='utf-8') if ext=='.json' else fp)
+                    except Exception as e:
+                        print(f"❌ Failed to parse {name}{ext}: {e}", file=sys.stderr)
+                        sys.exit(1)
+            print(f"❌ No {name}.jsonc or {name}.json in {path}", file=sys.stderr)
+            sys.exit(1)
+        
+        d = ModelData()
+        d.input_data       = pd.read_csv(os.path.join(path, 'input_data.csv'))
+        d.output_template  = pd.read_csv(os.path.join(path, 'output_template.csv'))
+        d.parameters       = load_any('parameters')
+        hier               = load_any('hierarchy')
+        d.hierarchy.add_nodes_from(hier['nodes'])
+        d.hierarchy.add_edges_from(hier['edges'])
+        d.nodes_to_fit     = load_any('nodes_to_fit')
+        return d
+
+
+## Not used for now
     def describe(self, data_type):
         G = self.hierarchy
         df = self.get_data(data_type)
@@ -271,94 +341,6 @@ class ModelData:
                     plt.plot(x, pred.mean(0), linewidth=3, color=plot.colors[0])
 
             plt.axis(xmin=-5, xmax=105)
-
-    def keep(self, areas=['all'], sexes=['male', 'female', 'total'], start_year=-pl.inf, end_year=pl.inf):
-        """ Modify model to feature only desired area/sex/year(s)
-
-        :Parameters:
-          - `areas` : list of str, optional
-          - `sexes` : list of str, optional
-          - `start_year` : int, optional
-          - `end_year` : int, optional
-
-        """
-        if 'all' not in areas:
-            self.hierarchy.remove_node('all')
-            for area in areas:
-                self.hierarchy.add_edge('all', area)
-            self.hierarchy = nx.bfs_tree(self.hierarchy, 'all')
-
-            def relevant_row(i):
-                area = self.input_data['area'][i]
-                return (area in self.hierarchy) or (area == 'all')
-
-            rows = [i for i in self.input_data.index if relevant_row(i)]
-            self.input_data = self.input_data.loc[rows]
-            self.nodes_to_fit = set(self.hierarchy.nodes()) & set(self.nodes_to_fit)
-
-        self.input_data = self.input_data[self.input_data.sex.isin(sexes)]
-
-        self.input_data = self.input_data[self.input_data.year_end >= start_year]
-        self.input_data = self.input_data[self.input_data.year_start <= end_year]
-
-        print('kept %d rows of data' % len(self.input_data.index))
-
-    def save(self, path):
-        """ Saves all model data in human-readable files
-
-        :Parameters:
-          - `path` : str, directory to save in
-
-        :Results:
-          - Saves files to specified path, overwritting what was there before
-
-        """
-
-        self.input_data.to_csv(path + '/input_data.csv')
-        self.output_template.to_csv(path + '/output_template.csv')
-        json.dump(self.parameters, open(path + '/parameters.json', 'w'), indent=2)
-        json.dump(dict(nodes=[[n, self.hierarchy.node[n]] for n in sorted(self.hierarchy.nodes())],
-                       edges=[[u, v, self.hierarchy.edge[u][v]] for u,v in sorted(self.hierarchy.edges())]),
-                  open(path + '/hierarchy.json', 'w'), indent=2)
-        json.dump(list(self.nodes_to_fit), open(path + '/nodes_to_fit.json', 'w'), indent=2)
-
-    @staticmethod
-    def load(path):
-        import re, sys, os
-        def load_jsonc(fp):
-            txt = open(fp, encoding='utf-8').read()
-            # 1) strip comments
-            no_comments = re.sub(r'//.*?$|/\*.*?\*/', '', txt, flags=re.MULTILINE | re.DOTALL)
-            # 2) remove trailing commas before } or ]
-            clean = re.sub(r',\s*([}\]])', r'\1', no_comments)
-            try:
-                return json.loads(clean)
-            except json.JSONDecodeError as e:
-                print(f"❌ JSONC parse error in {fp}: {e}", file=sys.stderr)
-                sys.exit(1)
-        
-        def load_any(name):
-            for ext, loader in (('.jsonc', load_jsonc), ('.json', json.load)):
-                fp = os.path.join(path, f"{name}{ext}")
-                if os.path.isfile(fp):
-                    try:
-                        return loader(open(fp, 'r', encoding='utf-8') if ext=='.json' else fp)
-                    except Exception as e:
-                        print(f"❌ Failed to parse {name}{ext}: {e}", file=sys.stderr)
-                        sys.exit(1)
-            print(f"❌ No {name}.jsonc or {name}.json in {path}", file=sys.stderr)
-            sys.exit(1)
-        
-        d = ModelData()
-        d.input_data       = pd.read_csv(os.path.join(path, 'input_data.csv'))
-        d.output_template  = pd.read_csv(os.path.join(path, 'output_template.csv'))
-        d.parameters       = load_any('parameters')
-        hier               = load_any('hierarchy')
-        d.hierarchy.add_nodes_from(hier['nodes'])
-        d.hierarchy.add_edges_from(hier['edges'])
-        d.nodes_to_fit     = load_any('nodes_to_fit')
-        return d
-
 
     def invalid_precision(self):
         """ Identify rows of data with invalid precision
@@ -618,6 +600,24 @@ class ModelData:
             self.vars = model.consistent(self, rate_type=rate_model)
             self.model_settings['consistent'] = True
 
+    def save(self, path):
+        """ Saves all model data in human-readable files
+
+        :Parameters:
+          - `path` : str, directory to save in
+
+        :Results:
+          - Saves files to specified path, overwritting what was there before
+
+        """
+
+        self.input_data.to_csv(path + '/input_data.csv')
+        self.output_template.to_csv(path + '/output_template.csv')
+        json.dump(self.parameters, open(path + '/parameters.json', 'w'), indent=2)
+        json.dump(dict(nodes=[[n, self.hierarchy.node[n]] for n in sorted(self.hierarchy.nodes())],
+                       edges=[[u, v, self.hierarchy.edge[u][v]] for u,v in sorted(self.hierarchy.edges())]),
+                  open(path + '/hierarchy.json', 'w'), indent=2)
+        json.dump(list(self.nodes_to_fit), open(path + '/nodes_to_fit.json', 'w'), indent=2)
 
 load = ModelData.load
 
