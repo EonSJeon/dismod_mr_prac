@@ -66,6 +66,7 @@ def mean_covariate_model(name, mu, input_data, parameters, model, root_area, roo
     U = pd.DataFrame(np.zeros((n, p_U)), columns=model.hierarchy.nodes(), index=input_data.index)
     for i, row in input_data.T.iteritems():
         if row['area'] not in model.hierarchy:
+            print(row['area'])
             print('WARNING: "%s" not in model hierarchy, skipping random effects for this observation' % row['area'])
             continue
 
@@ -101,6 +102,8 @@ def mean_covariate_model(name, mu, input_data, parameters, model, root_area, roo
         if node in U_shift:
             U_shift[node] = 1.
     U -= U_shift
+
+    # root_area 이상의 지역을 고려대상에서 제외
 
     sigma_alpha = []
     for i in range(5):  # max depth of hierarchy is 5
@@ -286,7 +289,8 @@ def dispersion_covariate_model(name, input_data, delta_lb, delta_ub):
         return dict(eta=eta, delta=delta)
 
 
-def predict_for(model, parameters,
+def predict_for(model, 
+                parameters,
                 root_area, root_sex, root_year,
                 area, sex, year,
                 population_weighted,

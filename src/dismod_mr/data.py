@@ -77,7 +77,6 @@ def describe_vars(d):
     return df.sort_values(by='logp')
 
 
-
 def check_convergence(vars):
     """ Apply a simple test of convergence to the model: compare
     autocorrelation at 25 lags to zero lags.  warn about convergence if it exceeds
@@ -122,8 +121,8 @@ class ModelVars(dict):
         self.update(d)
         return self
 
-    # def __str__(self):
-    #     return '%s\nkeys: %s' % (describe_vars(self), ', '.join(self.keys()))
+    def __str__(self):
+        return '%s\nkeys: %s' % (describe_vars(self), ', '.join(self.keys()))
 
     def describe(self):
         print(describe_vars(self))
@@ -209,7 +208,6 @@ class ModelData:
         for n in nx.dfs_preorder_nodes(G, 'all'):
             if G.node[n]['cnt'] > 0:
                 print(' *'*G.node[n]['depth'], n, int(G.node[n]['cnt']))
-
 
     def plot(self, rate_type=None):
         import matplotlib.pyplot as plt, numpy as np

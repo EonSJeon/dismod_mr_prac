@@ -37,6 +37,15 @@ def age_specific_rate(model,
                       zero_re=False):
     # TODO: expose (and document) interface for alternative rate_type as well as other options,
     # record reference values in the model
+    '''
+    * $\gamma$ : **스플라인 knot** 파라미터들 (예: `vars['gamma']`)
+    * $\alpha$ : **랜덤 효과(R.E.)** (예: 지역·성별·연도 등)
+    * $\beta$ : **고정 효과(F.E.)** (예: 공변량 회귀계수)
+    * $\eta, \zeta$ : **분산(이질성) 관련 파라미터**
+    * 기타 함께 들어가는 항들(예: `p_obs`, `pi_sim`, `smooth_gamma`, `parent_similarity` 등)은 모델의 로그우도/로그사전분포를 구성하는 데 필요하지만, 
+    직접적으로 최적화 대상이 아닌 이미 정해진(?) Observed Stochastic이거나 Potential 노드일 수도 있습니다.
+    '''
+
     """ Generate PyMC objects for model of epidemological age-interval data
 
     :Parameters:
@@ -100,16 +109,17 @@ def age_specific_rate(model,
     vars.update(dismod_mr.model.priors.level_constraints(name, parameters, vars['mu_age'], ages))
     vars.update(dismod_mr.model.priors.derivative_constraints(name, parameters, vars['mu_age'], ages))
 
+
     if type(mu_age_parent) != type(None):
         # setup a hierarchical prior on the simliarity between the
         # consistent estimate here and (inconsistent) estimate for its
         # parent in the areas hierarchy
         #weight_dict = {'Unusable': 10., 'Slightly': 10., 'Moderately': 1., 'Very': .1}
         #weight = weight_dict[parameters['heterogeneity']]
+
         vars.update(
             dismod_mr.model.priors.similar('parent_similarity_%s' % name, vars['mu_age'], mu_age_parent, sigma_age_parent, 0.)
             )
-
         # also use this as the initial value for the age pattern, if it is not already specified
         if mu_age == None:
             if isinstance(mu_age_parent, mc.Node):  # TODO: test this code
@@ -119,6 +129,8 @@ def age_specific_rate(model,
 
             for i, k_i in enumerate(knots):
                 vars['gamma'][i].value = (np.log(initial_mu[k_i-ages[0]])).clip(-12,6)
+
+
 
     age_weights = np.ones_like(vars['mu_age'].value) # TODO: use age pattern appropriate to the rate type
     if len(data) > 0:
@@ -145,7 +157,13 @@ def age_specific_rate(model,
         ## ensure that all data has uncertainty quantified appropriately
         # first replace all missing se from ci
         missing_se = np.isnan(data['standard_error']) | (data['standard_error'] < 0)
-        data.loc[data[missing_se].index, 'standard_error'] = (data['upper_ci'][missing_se] - data['lower_ci'][missing_se]) / (2*1.96)
+        # missing_se is your boolean mask indicating where standard_error is missing
+        if missing_se.any():
+            # only print & fill if there’s at least one True
+            print(data[missing_se])
+            data.loc[missing_se, 'standard_error'] = (
+                data.loc[missing_se, 'upper_ci'] - data.loc[missing_se, 'lower_ci']
+            ) / (2 * 1.96)
 
         # then replace all missing ess with se
         missing_ess = data[np.isnan(data['effective_sample_size'])].index
@@ -242,6 +260,7 @@ def age_specific_rate(model,
     if include_covariates:
         vars.update(dismod_mr.model.priors.covariate_level_constraints(name, model, vars, ages))
 
+    
 
     if lower_bound and len(lb_data) > 0:
         vars['lb'] = dismod_mr.model.age_groups.age_standardize_approx('lb_%s' % name, age_weights, vars['mu_age'], lb_data['age_start'], lb_data['age_end'], ages)
@@ -281,6 +300,11 @@ def age_specific_rate(model,
     return result
 
 def consistent(model, reference_area='all', reference_sex='total', reference_year='all', priors={}, zero_re=True, rate_type='neg_binom'):
+    '''
+    * **`consistent`**: 
+    여러 레이트(`i,r,f,p,pf,m_with` 등)를 **동시에** 연결해, “질병 자연사(disease natural history) 모델” 같은 **전체(consistent) 모델**을 구성하는 **상위 레벨(종합) 함수**.
+    * 내부에서 `age_specific_rate`를 여러 번 호출하고, 그 결과를 서로 연계(ODE, logit, etc.)하여 일관적 관계를 유지하는 하나의 큰 모델을 만든다.
+    '''
     """ Generate PyMC objects for consistent model of epidemological data
 
     :Parameters:

@@ -319,8 +319,15 @@ def find_re_initial_vals(vars, method, tol, verbose):
             if successors:
                 #print successors
 
-                vars_to_fit = [vars.get('p_obs'), vars.get('pi_sim'), vars.get('smooth_gamma'), vars.get('parent_similarity'),
-                               vars.get('mu_sim'), vars.get('mu_age_derivative_potential'), vars.get('covariate_constraint')]
+                vars_to_fit = [
+                    vars.get('p_obs'), 
+                    vars.get('pi_sim'), 
+                    vars.get('smooth_gamma'), 
+                    vars.get('parent_similarity'),
+                    vars.get('mu_sim'), 
+                    vars.get('mu_age_derivative_potential'), 
+                    vars.get('covariate_constraint')
+                ]
                 vars_to_fit += [vars.get('alpha_potentials')]
 
                 re_vars = [vars['alpha'][col_map[n]] for n in list(successors) + [p] if n in vars['U']]
@@ -332,9 +339,17 @@ def find_re_initial_vals(vars, method, tol, verbose):
                 #print_mare(vars)
 
     #print 'sigma_alpha'
-    vars_to_fit = [vars.get('p_obs'), vars.get('pi_sim'), vars.get('smooth_gamma'), vars.get('parent_similarity'),
-                   vars.get('mu_sim'), vars.get('mu_age_derivative_potential'), vars.get('covariate_constraint')]
+    vars_to_fit = [
+        vars.get('p_obs'), 
+        vars.get('pi_sim'), 
+        vars.get('smooth_gamma'), 
+        vars.get('parent_similarity'),
+        vars.get('mu_sim'), 
+        vars.get('mu_age_derivative_potential'), 
+        vars.get('covariate_constraint')
+    ]
     vars_to_fit += [vars.get('sigma_alpha')]
+
     mc.MAP(vars_to_fit).fit(method=method, tol=tol, verbose=verbose)
     #print np.round_([s.value for s in vars['sigma_alpha']])
     #print_mare(vars)
@@ -342,15 +357,30 @@ def find_re_initial_vals(vars, method, tol, verbose):
 
 def find_fe_initial_vals(vars, method, tol, verbose):
     # fixed effect
-    vars_to_fit = [vars.get('p_obs'), vars.get('pi_sim'), vars.get('smooth_gamma'), vars.get('parent_similarity'),
-                   vars.get('mu_sim'), vars.get('mu_age_derivative_potential'), vars.get('covariate_constraint')]
+    vars_to_fit = [
+        vars.get('p_obs'), 
+        vars.get('pi_sim'), 
+        vars.get('smooth_gamma'), 
+        vars.get('parent_similarity'),
+        vars.get('mu_sim'), 
+        vars.get('mu_age_derivative_potential'), 
+        vars.get('covariate_constraint')
+    ]
     vars_to_fit += [vars.get('beta')]  # include fixed effects in sequential fit
+
     mc.MAP(vars_to_fit).fit(method=method, tol=tol, verbose=verbose)
     #print_mare(vars)
 
 def find_dispersion_initial_vals(vars, method, tol, verbose):
-    vars_to_fit = [vars.get('p_obs'), vars.get('pi_sim'), vars.get('smooth_gamma'), vars.get('parent_similarity'),
-                   vars.get('mu_sim'), vars.get('mu_age_derivative_potential'), vars.get('covariate_constraint')]
+    vars_to_fit = [
+        vars.get('p_obs'), 
+        vars.get('pi_sim'), 
+        vars.get('smooth_gamma'), 
+        vars.get('parent_similarity'),
+        vars.get('mu_sim'), 
+        vars.get('mu_age_derivative_potential'), 
+        vars.get('covariate_constraint')
+    ]
     vars_to_fit += [vars.get('eta'), vars.get('zeta')]
     mc.MAP(vars_to_fit).fit(method=method, tol=tol, verbose=verbose)
     #print_mare(vars)
