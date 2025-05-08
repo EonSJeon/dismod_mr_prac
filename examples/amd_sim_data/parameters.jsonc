@@ -301,8 +301,8 @@
     // Default p values before and after key ages
     "level_value": {
       "age_before": 30,   // holds before this age
-      "value":       0.0, // p value
-      "age_after":  100   // holds after this age
+      "age_after":  100,   // holds after this age
+      "value":       0.0   // p value
     },
 
     // Mesh points used for parameter interpolation
@@ -319,6 +319,11 @@
       "amount":    "Slightly", // smoothing intensity
       "age_end":   100         // smoothing ends
     }
+    // pg 40
+    // ||h'|| ~ N(0, sigma^2)
+    // "slightly smooth": sigma = 0.05
+    // "moderately smooth": sigma = 0.05
+    // "very smooth": sigma = 0.005
   },
 
   "r": {

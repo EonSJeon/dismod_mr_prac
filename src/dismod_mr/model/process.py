@@ -45,7 +45,7 @@ def age_specific_rate(model,
     '''
     """Generate PyMC objects for epidemiological age-interval data model"""
 
-    name = data_type
+    _data_type = data_type
     result = dismod_mr.data.ModelVars()  # 반환용 컨테이너 초기화
 
     # 부모 mu_age_parent나 sigma_age_parent에 NaN이 있으면 계층적 prior 무시
@@ -85,7 +85,7 @@ def age_specific_rate(model,
     # mu_age 지정 없으면 spline 작성, 있으면 재활용
     if mu_age is None:
         vars.update(
-            dismod_mr.model.spline.spline(name,
+            dismod_mr.model.spline.spline(_data_type,
                                           ages=ages,
                                           knots=knots,
                                           smoothing=smoothing,
@@ -95,13 +95,13 @@ def age_specific_rate(model,
         vars.update(dict(mu_age=mu_age, ages=ages))
 
     # spline level 및 derivative 제약 추가
-    vars.update(dismod_mr.model.priors.level_constraints(name, parameters, vars['mu_age'], ages))
-    vars.update(dismod_mr.model.priors.derivative_constraints(name, parameters, vars['mu_age'], ages))
+    vars.update(dismod_mr.model.priors.level_constraints(_data_type, parameters, vars['mu_age'], ages))
+    vars.update(dismod_mr.model.priors.derivative_constraints(_data_type, parameters, vars['mu_age'], ages))
 
     # 부모 패턴과의 유사성 prior 적용 (계층 모델)
     if mu_age_parent is not None:
         vars.update(
-            dismod_mr.model.priors.similar('parent_similarity_%s' % name,
+            dismod_mr.model.priors.similar('parent_similarity_%s' % _data_type,
                                            vars['mu_age'],
                                            mu_age_parent,
                                            sigma_age_parent,
@@ -119,7 +119,7 @@ def age_specific_rate(model,
     if len(data) > 0:
         # interval average 근사
         vars.update(
-            dismod_mr.model.age_groups.age_standardize_approx(name,
+            dismod_mr.model.age_groups.age_standardize_approx(_data_type,
                                                               age_weights,
                                                               vars['mu_age'],
                                                               data['age_start'],
@@ -129,7 +129,7 @@ def age_specific_rate(model,
         # covariate 모델링 or interval mu 직접 사용
         if include_covariates:
             vars.update(
-                dismod_mr.model.covariates.mean_covariate_model(name,
+                dismod_mr.model.covariates.mean_covariate_model(_data_type,
                                                                  vars['mu_interval'],
                                                                  data,
                                                                  parameters,
@@ -145,29 +145,30 @@ def age_specific_rate(model,
         # 결측 standard_error 보정: CI 이용
         missing_se = np.isnan(data['standard_error']) | (data['standard_error'] < 0)
         if missing_se.any():
-            print(data[missing_se])
+
             data.loc[missing_se, 'standard_error'] = (
                 data.loc[missing_se, 'upper_ci'] - data.loc[missing_se, 'lower_ci']
             ) / (2 * 1.96)
 
         # 결측 effective_sample_size 보정
         missing_ess = data['effective_sample_size'].isna()
-        data.loc[missing_ess, 'effective_sample_size'] = (
-            data.loc[missing_ess, 'value'] * (1 - data.loc[missing_ess, 'value'])
-            / data.loc[missing_ess, 'standard_error'] ** 2
-        )
+        if missing_ess.any():
+            data.loc[missing_ess, 'effective_sample_size'] = (
+                data.loc[missing_ess, 'value'] * (1 - data.loc[missing_ess, 'value'])
+                / data.loc[missing_ess, 'standard_error'] ** 2
+            )
 
         # 각 rate_type별 likelihood 설정
         if rate_type == 'neg_binom':
-            # invalid ess 처리
-            bad_ess = data['effective_sample_size'] < 0
+            # non-positive or missing ESS 처리: 음수, 0, NaN 모두 0으로 설정
+            bad_ess = (data['effective_sample_size'] <= 0) | data['effective_sample_size'].isna()
             if bad_ess.any():
-                print(f'WARNING: {bad_ess.sum()} rows of {name} invalid ess.')
+                print(f'WARNING: {bad_ess.sum()} rows of {_data_type} have non-positive or missing ESS.')
                 data.loc[bad_ess, 'effective_sample_size'] = 0.0
             # 과도한 ess 처리
             big_ess = data['effective_sample_size'] >= 1e10
             if big_ess.any():
-                print(f'WARNING: {big_ess.sum()} rows of {name} ess >1e10.')
+                print(f'WARNING: {big_ess.sum()} rows of {_data_type} ess >1e10.')
                 data.loc[big_ess, 'effective_sample_size'] = 1e10
 
             # heterogeneity에 따른 dispersion lower bound
@@ -178,14 +179,15 @@ def age_specific_rate(model,
 
             # dispersion covariate prior
             vars.update(
-                dismod_mr.model.covariates.dispersion_covariate_model(name,
+                dismod_mr.model.covariates.dispersion_covariate_model(_data_type,
                                                                       data,
                                                                       lower,
                                                                       lower * 9.)
             )
+
             # neg binomial likelihood
             vars.update(
-                dismod_mr.model.likelihood.neg_binom(name,
+                dismod_mr.model.likelihood.neg_binom(_data_type,
                                                       vars['pi'],
                                                       vars['delta'],
                                                       data['value'],
@@ -196,13 +198,13 @@ def age_specific_rate(model,
             # missing SE 처리
             missing = data['standard_error'] < 0
             if missing.any():
-                print(f'WARNING: {missing.sum()} rows of {name} no SE.')
+                print(f'WARNING: {missing.sum()} rows of {_data_type} no SE.')
                 data.loc[missing, 'standard_error'] = 1e6
             # sigma prior
-            vars['sigma'] = mc.Uniform(f'sigma_{name}', lower=.0001, upper=1., value=.01)
+            vars['sigma'] = mc.Uniform(f'sigma_{_data_type}', lower=.0001, upper=1., value=.01)
             # log-normal likelihood
             vars.update(
-                dismod_mr.model.likelihood.log_normal(name,
+                dismod_mr.model.likelihood.log_normal(_data_type,
                                                        vars['pi'],
                                                        vars['sigma'],
                                                        data['value'],
@@ -213,13 +215,13 @@ def age_specific_rate(model,
             # missing SE 처리
             missing = data['standard_error'] < 0
             if missing.any():
-                print(f'WARNING: {missing.sum()} rows of {name} no SE.')
+                print(f'WARNING: {missing.sum()} rows of {_data_type} no SE.')
                 data.loc[missing, 'standard_error'] = 1e6
             # sigma prior
-            vars['sigma'] = mc.Uniform(f'sigma_{name}', lower=.0001, upper=.1, value=.01)
+            vars['sigma'] = mc.Uniform(f'sigma_{_data_type}', lower=.0001, upper=.1, value=.01)
             # normal likelihood
             vars.update(
-                dismod_mr.model.likelihood.normal(name,
+                dismod_mr.model.likelihood.normal(_data_type,
                                                   vars['pi'],
                                                   vars['sigma'],
                                                   data['value'],
@@ -230,10 +232,10 @@ def age_specific_rate(model,
             # invalid ess 처리
             bad_ess = data['effective_sample_size'] < 0
             if bad_ess.any():
-                print(f'WARNING: {bad_ess.sum()} rows of {name} invalid ess.')
+                print(f'WARNING: {bad_ess.sum()} rows of {_data_type} invalid ess.')
                 data.loc[bad_ess, 'effective_sample_size'] = 0.0
             # binomial likelihood
-            vars += dismod_mr.model.likelihood.binom(name,
+            vars += dismod_mr.model.likelihood.binom(_data_type,
                                                       vars['pi'],
                                                       data['value'],
                                                       data['effective_sample_size'])
@@ -241,7 +243,7 @@ def age_specific_rate(model,
         elif rate_type in ['beta_binom', 'beta_binom_2']:
             # beta-binomial variants
             fn = dismod_mr.model.likelihood.beta_binom if rate_type == 'beta_binom' else dismod_mr.model.likelihood.beta_binom_2
-            vars += fn(name,
+            vars += fn(_data_type,
                        vars['pi'],
                        data['value'],
                        data['effective_sample_size'])
@@ -250,18 +252,18 @@ def age_specific_rate(model,
             # invalid ess 처리
             bad_ess = data['effective_sample_size'] < 0
             if bad_ess.any():
-                print(f'WARNING: {bad_ess.sum()} rows of {name} invalid ess.')
+                print(f'WARNING: {bad_ess.sum()} rows of {_data_type} invalid ess.')
                 data.loc[bad_ess, 'effective_sample_size'] = 0.0
             # poisson likelihood
-            vars += dismod_mr.model.likelihood.poisson(name,
+            vars += dismod_mr.model.likelihood.poisson(_data_type,
                                                         vars['pi'],
                                                         data['value'],
                                                         data['effective_sample_size'])
 
         elif rate_type == 'offset_log_normal':
             # offset log-normal likelihood
-            vars['sigma'] = mc.Uniform(f'sigma_{name}', lower=.0001, upper=10., value=.01)
-            vars += dismod_mr.model.likelihood.offset_log_normal(name,
+            vars['sigma'] = mc.Uniform(f'sigma_{_data_type}', lower=.0001, upper=10., value=.01)
+            vars += dismod_mr.model.likelihood.offset_log_normal(_data_type,
                                                                   vars['pi'],
                                                                   vars['sigma'],
                                                                   data['value'],
@@ -274,7 +276,7 @@ def age_specific_rate(model,
         # 데이터 없으면 covariate 만 모델링
         if include_covariates:
             vars.update(
-                dismod_mr.model.covariates.mean_covariate_model(name,
+                dismod_mr.model.covariates.mean_covariate_model(_data_type,
                                                                  [],
                                                                  data,
                                                                  parameters,
@@ -287,13 +289,13 @@ def age_specific_rate(model,
 
     # covariate-level 제약 추가
     if include_covariates:
-        vars.update(dismod_mr.model.priors.covariate_level_constraints(name, model, vars, ages))
+        vars.update(dismod_mr.model.priors.covariate_level_constraints(_data_type, model, vars, ages))
 
     # lower_bound 데이터 별도 처리
     if lower_bound and len(lb_data) > 0:
         # 하위 경계 interval approx
         vars['lb'] = dismod_mr.model.age_groups.age_standardize_approx(
-            f'lb_{name}',
+            f'lb_{_data_type}',
             age_weights,
             vars['mu_age'],
             lb_data['age_start'],
@@ -304,7 +306,7 @@ def age_specific_rate(model,
         if include_covariates:
             vars['lb'].update(
                 dismod_mr.model.covariates.mean_covariate_model(
-                    f'lb_{name}',
+                    f'lb_{_data_type}',
                     vars['lb']['mu_interval'],
                     lb_data,
                     parameters,
@@ -320,7 +322,7 @@ def age_specific_rate(model,
         # dispersion covariate
         vars['lb'].update(
             dismod_mr.model.covariates.dispersion_covariate_model(
-                f'lb_{name}',
+                f'lb_{_data_type}',
                 lb_data,
                 1e12,
                 1e13
@@ -339,12 +341,12 @@ def age_specific_rate(model,
         )
         bad_ess_lb = lb_data['effective_sample_size'] <= 0
         if bad_ess_lb.any():
-            print(f'WARNING: {bad_ess_lb.sum()} rows of {name} lower bound invalid ess.')
+            print(f'WARNING: {bad_ess_lb.sum()} rows of {_data_type} lower bound invalid ess.')
             lb_data.loc[bad_ess_lb, 'effective_sample_size'] = 1.0
         # neg_binom lower-bound likelihood
         vars['lb'].update(
             dismod_mr.model.likelihood.neg_binom_lower_bound(
-                f'lb_{name}',
+                f'lb_{_data_type}',
                 vars['lb']['pi'],
                 vars['lb']['delta'],
                 lb_data['value'],
@@ -354,7 +356,6 @@ def age_specific_rate(model,
 
     result[data_type] = vars
     return result
-
 
 
 

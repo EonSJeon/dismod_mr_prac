@@ -18,10 +18,15 @@
 import numpy as np
 import pymc as mc
 
+'''
+CH 4
+level bound priors
+level value priors
+monotonicity priors
+'''
 
 def similar(name, mu_child, mu_parent, sigma_parent, sigma_difference, offset=1.e-9):
-    """ Generate PyMC objects encoding a simliarity prior on mu_child
-    to mu_parent
+    """ Generate PyMC objects encoding a simliarity prior on mu_child to mu_parent
 
     Parameters
     ----------
@@ -51,11 +56,11 @@ def similar(name, mu_child, mu_parent, sigma_parent, sigma_difference, offset=1.
     return dict(parent_similarity=parent_similarity)
 
 
-def level_constraints(name, parameters, unconstrained_mu_age, ages):
+def level_constraints(rate_type, parameters, unconstrained_mu_age, ages):
     """ Generate PyMC objects implementing priors on the value of the rate function
 
     :Parameters:
-      - `name` : str
+      - `rate_type` : str
       - `parameters` : dict of dicts, with keys level_value and level_bounds
            level_value with keys value, age_before, and age_after
            level_bounds with keys lower and upper
@@ -69,7 +74,7 @@ def level_constraints(name, parameters, unconstrained_mu_age, ages):
     if 'level_value' not in parameters or 'level_bounds' not in parameters:
         return {}
 
-    @mc.deterministic(name='value_constrained_mu_age_%s'%name)
+    @mc.deterministic(name='value_constrained_mu_age_%s'%rate_type)
     def mu_age(unconstrained_mu_age=unconstrained_mu_age,
                value=parameters['level_value']['value'],
                age_before=np.clip(parameters['level_value']['age_before']-ages[0], 0, len(ages)),
@@ -81,7 +86,7 @@ def level_constraints(name, parameters, unconstrained_mu_age, ages):
         if age_after < len(mu_age)-1:
             mu_age[(age_after+1):] = value
         return mu_age.clip(lower, upper)
-    mu_sim = similar('value_constrained_mu_age_%s'%name, mu_age, unconstrained_mu_age, 0., .01, 1.e-6)
+    mu_sim = similar('value_constrained_mu_age_%s'%rate_type, mu_age, unconstrained_mu_age, 0., .01, 1.e-6)
 
     return dict(mu_age=mu_age, unconstrained_mu_age=unconstrained_mu_age, mu_sim=mu_sim)
 

@@ -4,13 +4,13 @@
       ["all", { "level": 0 }],
 
       // ───────── Super-Regions (level 1) ─────────
-      ["super-region_0", { "level": 1 }],
-      ["super-region_1", { "level": 1 }],
-      ["super-region_2", { "level": 1 }],
-      ["super-region_3", { "level": 1 }],
-      ["super-region_4", { "level": 1 }],
-      ["super-region_5", { "level": 1 }],
-      ["super-region_6", { "level": 1 }],
+      ["super-region_0", { "level": 1 }], // (High-Income & Australasia)
+      ["super-region_1", { "level": 1 }], // (Central Europe & Central Asia)
+      ["super-region_2", { "level": 1 }], // (Sub-Saharan Africa)
+      ["super-region_3", { "level": 1 }], // (North Africa & Middle East)
+      ["super-region_4", { "level": 1 }], // (South Asia)
+      ["super-region_5", { "level": 1 }], // (East & Southeast Asia, Oceania)
+      ["super-region_6", { "level": 1 }], // (Latin America & Caribbean)
 
       // ───────── Subregions of Super-Region 0 (level 2) ─────────
       // (High-Income & Australasia)
@@ -230,7 +230,62 @@
       ["WSM", { "level": 3, "pop": 531.2459991356043 }],
       ["SLB", { "level": 3, "pop": 1332.361439754646 }],
       ["TON", { "level": 3, "pop": 303.3467914712019 }],
-      ["VUT", { "level": 3, "pop": 601.0066566616839 }]
+      ["VUT", { "level": 3, "pop": 601.0066566616839 }],
+      
+      // ───────── Leaves under Sub-Saharan Africa Central ─────────
+      ["AGO", { "level": 3, "pop": NaN }],
+      ["CAF", { "level": 3, "pop": NaN }],
+      ["COD", { "level": 3, "pop": NaN }],
+      ["COG", { "level": 3, "pop": NaN }],
+      ["GAB", { "level": 3, "pop": NaN }],
+      ["GNQ", { "level": 3, "pop": NaN }],
+
+      // ───────── Leaves under Sub-Saharan Africa East ─────────
+      ["BDI", { "level": 3, "pop": NaN }],
+      ["COM", { "level": 3, "pop": NaN }],
+      ["DJI", { "level": 3, "pop": NaN }],
+      ["ERI", { "level": 3, "pop": NaN }],
+      ["ETH", { "level": 3, "pop": NaN }],
+      ["KEN", { "level": 3, "pop": NaN }],
+      ["MDG", { "level": 3, "pop": NaN }],
+      ["MOZ", { "level": 3, "pop": NaN }],
+      ["MWI", { "level": 3, "pop": NaN }],
+      ["RWA", { "level": 3, "pop": NaN }],
+      ["SOM", { "level": 3, "pop": NaN }],
+      ["SSD", { "level": 3, "pop": NaN }],
+      ["TZA", { "level": 3, "pop": NaN }],
+      ["UGA", { "level": 3, "pop": NaN }],
+      ["ZMB", { "level": 3, "pop": NaN }],
+
+      // ───────── Leaves under Sub-Saharan Africa Southern ─────────
+      ["BWA", { "level": 3, "pop": NaN }],
+      ["LSO", { "level": 3, "pop": NaN }],
+      ["NAM", { "level": 3, "pop": NaN }],
+      ["SWZ", { "level": 3, "pop": NaN }],
+      ["ZAF", { "level": 3, "pop": NaN }],
+      ["ZWE", { "level": 3, "pop": NaN }],
+      
+      // ───────── Leaves under Sub-Saharan Africa Western ─────────
+      ["BEN", { "level": 3, "pop": NaN }],
+      ["BFA", { "level": 3, "pop": NaN }],
+      ["CIV", { "level": 3, "pop": NaN }],
+      ["CMR", { "level": 3, "pop": NaN }],
+      ["CPV", { "level": 3, "pop": NaN }],
+      ["TCD", { "level": 3, "pop": NaN }],
+      ["GMB", { "level": 3, "pop": NaN }],
+      ["GHA", { "level": 3, "pop": NaN }],
+      ["GIN", { "level": 3, "pop": NaN }],
+      ["GNB", { "level": 3, "pop": NaN }],
+      ["LBR", { "level": 3, "pop": NaN }],
+      ["MLI", { "level": 3, "pop": NaN }],
+      ["MRT", { "level": 3, "pop": NaN }],
+      ["NER", { "level": 3, "pop": NaN }],
+      ["NGA", { "level": 3, "pop": NaN }],
+      ["STP", { "level": 3, "pop": NaN }],
+      ["SEN", { "level": 3, "pop": NaN }],
+      ["SLE", { "level": 3, "pop": NaN }],
+      ["TGO", { "level": 3, "pop": NaN }],
+      
     ],
   
     "edges": [
@@ -441,6 +496,27 @@
       ["oceania", "SLB", { "weight": NaN }],
       ["oceania", "TON", { "weight": NaN }],
       ["oceania", "VUT", { "weight": NaN }],
+
+      // ───────── Leaves under Sub-Saharan Africa West ─────────
+      ["sub-saharan_africa_west", "BEN", { "weight": NaN }],
+      ["sub-saharan_africa_west", "BFA", { "weight": NaN }],
+      ["sub-saharan_africa_west", "CIV", { "weight": NaN }],
+      ["sub-saharan_africa_west", "CMR", { "weight": NaN }],
+      ["sub-saharan_africa_west", "CPV", { "weight": NaN }],
+      ["sub-saharan_africa_west", "GHA", { "weight": NaN }],
+      ["sub-saharan_africa_west", "GIN", { "weight": NaN }],
+      ["sub-saharan_africa_west", "GMB", { "weight": NaN }],
+      ["sub-saharan_africa_west", "GNB", { "weight": NaN }],
+      ["sub-saharan_africa_west", "LBR", { "weight": NaN }],
+      ["sub-saharan_africa_west", "MLI", { "weight": NaN }],
+      ["sub-saharan_africa_west", "MRT", { "weight": NaN }],
+      ["sub-saharan_africa_west", "NER", { "weight": NaN }],
+      ["sub-saharan_africa_west", "NGA", { "weight": NaN }],
+      ["sub-saharan_africa_west", "SEN", { "weight": NaN }],
+      ["sub-saharan_africa_west", "SLE", { "weight": NaN }],
+      ["sub-saharan_africa_west", "STP", { "weight": NaN }],
+      ["sub-saharan_africa_west", "TCD", { "weight": NaN }],
+      ["sub-saharan_africa_west", "TGO", { "weight": NaN }],
     ]
   }
   
