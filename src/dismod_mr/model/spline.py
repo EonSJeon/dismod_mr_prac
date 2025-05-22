@@ -20,7 +20,7 @@ import pymc as mc
 import scipy.interpolate
 
 
-def spline(name, ages, knots, smoothing, interpolation_method='linear'):
+def spline(data_type, ages, knots, smoothing, interpolation_method='linear'):
     """ Generate PyMC objects for a spline model of age-specific rate
 
     Parameters
@@ -40,17 +40,17 @@ def spline(name, ages, knots, smoothing, interpolation_method='linear'):
     assert pl.all(pl.diff(knots) > 0), 'Spline knots must be strictly increasing'
 
     # TODO: consider changing this prior distribution to be something more familiar in linear space
-    gamma = [mc.Normal('gamma_%s_%d'%(name,k), 0., 10.**-2, value=-10.) for k in knots]
+    gamma = [mc.Normal('gamma_%s_%d'%(data_type,k), 0., 10.**-2, value=-10.) for k in knots]
     #gamma = [mc.Uniform('gamma_%s_%d'%(name,k), -20., 20., value=-10.) for k in knots]
 
     # TODO: fix AdaptiveMetropolis so that this is not necessary
-    flat_gamma = mc.Lambda('flat_gamma_%s'%name, lambda gamma=gamma: pl.array([x for x in pl.flatten(gamma)]))
+    flat_gamma = mc.Lambda('flat_gamma_%s'%data_type, lambda gamma=gamma: pl.array([x for x in pl.flatten(gamma)]))
 
     # pg 40
     # h(a) = \sigma 1[a_k<=a<a_{k+1}] * (exp(gamma_k) - exp(gamma_{k+1})의 내분점)
     # gamma_k ~ N(0, 10^2)
     
-    @mc.deterministic(name='mu_age_%s'%name)
+    @mc.deterministic(name='mu_age_%s'%data_type)
     def mu_age(gamma=flat_gamma, knots=knots, ages=ages):
         mu = scipy.interpolate.interp1d(knots, pl.exp(gamma), kind=interpolation_method, bounds_error=False, fill_value=0.)
         return mu(ages)
@@ -64,7 +64,7 @@ def spline(name, ages, knots, smoothing, interpolation_method='linear'):
     # "very smooth": sigma = 0.005
     if (smoothing > 0) and (not pl.isinf(smoothing)):
         #print 'adding smoothing of', smoothing
-        @mc.potential(name='smooth_mu_%s'%name)
+        @mc.potential(name='smooth_mu_%s'%data_type)
         def smooth_gamma(gamma=flat_gamma, knots=knots, tau=smoothing**-2):
             # the following is to include a "noise floor" so that level value
             # zero prior does not exert undue influence on age pattern

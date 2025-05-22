@@ -390,12 +390,14 @@ class ModelData:
 
     def predict_for(self, rate_type, area, sex, year):
         return dismod_mr.model.covariates.predict_for(
-            self, self.parameters[rate_type],
-            'all', 'total', 'all',
-            area, sex, year,
-            1., self.vars[rate_type],
-            self.parameters[rate_type]['level_bounds']['lower'],
-            self.parameters[rate_type]['level_bounds']['upper'])
+            model=self, 
+            parameters=self.parameters[rate_type],
+            root_area='all', root_sex='total', root_year='all',
+            area=area, sex=sex, year=year,
+            population_weighted=1., vars=self.vars[rate_type],
+            lower=self.parameters[rate_type]['level_bounds']['lower'],
+            upper=self.parameters[rate_type]['level_bounds']['upper']
+            )
 
     def set_smoothness(self, rate_type, value):
         """ Set smoothness parameter for age-specific rate function of one type.

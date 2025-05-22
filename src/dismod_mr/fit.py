@@ -307,52 +307,75 @@ def find_spline_initial_vals(vars, method, tol, verbose):
             print_mare(vars)
 
 def find_re_initial_vals(vars, method, tol, verbose):
-    # random effect
+    # Initialize and fit random-effect initial values via MAP
+    # 'vars' contains model variables, 'hierarchy' is the area tree
+
+    # If hierarchy not defined, nothing to do
     if 'hierarchy' not in vars:
         return
 
-    col_map = dict([[key, i] for i,key in enumerate(vars['U'].columns)])
+    # Map each region name to its column index in U (covariate indicator matrix)
+    col_map = {key: i for i, key in enumerate(vars['U'].columns)}
 
+    # Repeat the BFS MAP fitting process 3 times for stability
     for reps in range(3):
+        # Traverse hierarchy in breadth-first order from root 'all'
         for p in nx.traversal.bfs_tree(vars['hierarchy'], 'all'):
             successors = vars['hierarchy'].successors(p)
             if successors:
-                #print successors
-
+                # Prepare common potentials to fit at this level
                 vars_to_fit = [
-                    vars.get('p_obs'), 
-                    vars.get('pi_sim'), 
-                    vars.get('smooth_gamma'), 
-                    vars.get('parent_similarity'),
-                    vars.get('mu_sim'), 
-                    vars.get('mu_age_derivative_potential'), 
-                    vars.get('covariate_constraint')
+                    vars.get('p_obs'),                      # observed data potential
+                    vars.get('pi_sim'),                     # simulation prior potential
+                    vars.get('smooth_gamma'),               # smoothing spline potentials
+                    vars.get('parent_similarity'),          # parent-child similarity constraint
+                    vars.get('mu_sim'),                     # mean simulation potential
+                    vars.get('mu_age_derivative_potential'),# age derivative potential
+                    vars.get('covariate_constraint')        # covariate constraints
                 ]
+                # Include any global alpha potentials
                 vars_to_fit += [vars.get('alpha_potentials')]
 
-                re_vars = [vars['alpha'][col_map[n]] for n in list(successors) + [p] if n in vars['U']]
+                # Collect random-effect variables for this node and its children
+                re_vars = [
+                    vars['alpha'][col_map[n]]               # alpha node for region n
+                    for n in list(successors) + [p]
+                    if n in vars['U']                      # only if covariate exists
+                ]
+                # Append these random effects to the fitting list
                 vars_to_fit += re_vars
-                if len(re_vars) > 0:
-                    mc.MAP(vars_to_fit).fit(method=method, tol=tol, verbose=verbose)
 
-                #print np.round_([re.value for re in re_vars if isinstance(re, mc.Node)], 2)
-                #print_mare(vars)
+                if re_vars:
+                    # Perform MAP fitting on collected variables
+                    mc.MAP(vars_to_fit).fit(
+                        method=method,   # optimization method, e.g., 'Newton'
+                        tol=tol,         # convergence tolerance
+                        verbose=verbose  # verbosity flag
+                    )
 
-    #print 'sigma_alpha'
+                # Optional debug: print fitted random-effect values
+                # print(np.round_([rv.value for rv in re_vars if isinstance(rv, mc.Node)], 2))
+                # print_mare(vars)
+
+    # After BFS loops, fit sigma_alpha (global random-effect variances)
     vars_to_fit = [
-        vars.get('p_obs'), 
-        vars.get('pi_sim'), 
-        vars.get('smooth_gamma'), 
+        vars.get('p_obs'),
+        vars.get('pi_sim'),
+        vars.get('smooth_gamma'),
         vars.get('parent_similarity'),
-        vars.get('mu_sim'), 
-        vars.get('mu_age_derivative_potential'), 
+        vars.get('mu_sim'),
+        vars.get('mu_age_derivative_potential'),
         vars.get('covariate_constraint')
     ]
+    # Add sigma_alpha nodes for variance estimation
     vars_to_fit += [vars.get('sigma_alpha')]
 
+    # Perform final MAP fitting for sigma_alpha
     mc.MAP(vars_to_fit).fit(method=method, tol=tol, verbose=verbose)
-    #print np.round_([s.value for s in vars['sigma_alpha']])
-    #print_mare(vars)
+
+    # Optional debug: print fitted sigma_alpha values
+    # print(np.round_([s.value for s in vars['sigma_alpha']], 2))
+    # print_mare(vars)
 
 
 def find_fe_initial_vals(vars, method, tol, verbose):

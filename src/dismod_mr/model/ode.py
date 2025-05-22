@@ -19,8 +19,12 @@ import numpy as np
 
 
 @numba.jit(nopython=True)
-def f(a, susceptible_condition,
-        incidence, remission, excess, all_cause) :
+def f(a, 
+      susceptible_condition,
+      incidence, 
+      remission, 
+      excess, 
+      all_cause) :
         s      = susceptible_condition[0]
         c      = susceptible_condition[1]
         i      = incidence[int(a)]

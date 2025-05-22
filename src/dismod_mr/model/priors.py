@@ -25,12 +25,12 @@ level value priors
 monotonicity priors
 '''
 
-def similar(name, mu_child, mu_parent, sigma_parent, sigma_difference, offset=1.e-9):
+def similar(data_type, mu_child, mu_parent, sigma_parent, sigma_difference, offset=1.e-9):
     """ Generate PyMC objects encoding a simliarity prior on mu_child to mu_parent
 
     Parameters
     ----------
-    name : str
+    data_type : str
     mu_child : array or pymc.Node, the predicted values for the child node in the hierarchy
     mu_parent : array, the predicted values for the parent node in the hierarchy
     sigma_parent : array, the predicted standard devation for the parent node in the hierarchy
@@ -46,7 +46,7 @@ def similar(name, mu_child, mu_parent, sigma_parent, sigma_difference, offset=1.
     else:
         tau = 1. / (((sigma_parent+offset)/(mu_parent+offset))**2 + sigma_difference**2)
 
-    @mc.potential(name='parent_similarity_%s'%name)
+    @mc.potential(name='parent_similarity_%s'%data_type)
     def parent_similarity(mu_child=mu_child, mu_parent=mu_parent,
                           tau=tau):
         log_mu_child = np.log(mu_child.clip(offset, np.inf))
@@ -56,11 +56,11 @@ def similar(name, mu_child, mu_parent, sigma_parent, sigma_difference, offset=1.
     return dict(parent_similarity=parent_similarity)
 
 
-def level_constraints(rate_type, parameters, unconstrained_mu_age, ages):
+def level_constraints(data_type, parameters, unconstrained_mu_age, ages):
     """ Generate PyMC objects implementing priors on the value of the rate function
 
     :Parameters:
-      - `rate_type` : str
+      - `data_type` : str
       - `parameters` : dict of dicts, with keys level_value and level_bounds
            level_value with keys value, age_before, and age_after
            level_bounds with keys lower and upper
@@ -74,7 +74,7 @@ def level_constraints(rate_type, parameters, unconstrained_mu_age, ages):
     if 'level_value' not in parameters or 'level_bounds' not in parameters:
         return {}
 
-    @mc.deterministic(name='value_constrained_mu_age_%s'%rate_type)
+    @mc.deterministic(name='value_constrained_mu_age_%s'%data_type)
     def mu_age(unconstrained_mu_age=unconstrained_mu_age,
                value=parameters['level_value']['value'],
                age_before=np.clip(parameters['level_value']['age_before']-ages[0], 0, len(ages)),
@@ -86,7 +86,7 @@ def level_constraints(rate_type, parameters, unconstrained_mu_age, ages):
         if age_after < len(mu_age)-1:
             mu_age[(age_after+1):] = value
         return mu_age.clip(lower, upper)
-    mu_sim = similar('value_constrained_mu_age_%s'%rate_type, mu_age, unconstrained_mu_age, 0., .01, 1.e-6)
+    mu_sim = similar('value_constrained_mu_age_%s'%data_type, mu_age, unconstrained_mu_age, 0., .01, 1.e-6)
 
     return dict(mu_age=mu_age, unconstrained_mu_age=unconstrained_mu_age, mu_sim=mu_sim)
 

@@ -256,11 +256,11 @@ def normal(name, pi, sigma, p, s):
 
 
 # FIXME: negative ESS
-def log_normal(name, pi, sigma, p, s):
+def log_normal(data_type, pi, sigma, p, s):
     """ Generate PyMC objects for a lognormal model
 
     :Parameters:
-      - `name` : str
+      - `data_type` : str
       - `pi` : pymc.Node, expected values of rates
       - `sigma` : pymc.Node, dispersion parameters of rates
       - `p` : array, observed values of rates
@@ -274,14 +274,14 @@ def log_normal(name, pi, sigma, p, s):
     assert pl.all(s >= 0), 'standard error must be non-negative'
 
     i_inf = pl.isinf(s)
-    @mc.observed(name='p_obs_%s'%name)
+    @mc.observed(name='p_obs_%s'%data_type)
     def p_obs(value=p, pi=pi, sigma=sigma, s=s):
         return mc.normal_like(pl.log(value), pl.log(pi+1.e-9),
                               1./(sigma**2. + (s/value)**2.))
 
     s_noninf = s.copy()
     s_noninf[i_inf] = 0.
-    @mc.deterministic(name='p_pred_%s'%name)
+    @mc.deterministic(name='p_pred_%s'%data_type)
     def p_pred(pi=pi, sigma=sigma, s=s_noninf):
         return pl.exp(mc.rnormal(pl.log(pi+1.e-9), 1./(sigma**2. + (s/(pi+1.e-9))**2)))
 

@@ -22,7 +22,7 @@ import scipy.interpolate
 import dismod_mr
 
 
-def age_specific_rate(model, 
+def age_specific_rate(model: dismod_mr.data.ModelData, 
                       data_type, 
                       reference_area='all', 
                       reference_sex='total', 
@@ -58,6 +58,8 @@ def age_specific_rate(model,
     # 연령 목록, 데이터, 파라미터, 계층(hierarchy) 참조
     ages = np.array(model.parameters['ages'])
     data = model.get_data(data_type)
+    print("data================")
+    data.to_csv('data.csv')
     if lower_bound:
         lb_data = model.get_data(lower_bound)
     parameters = model.parameters.get(data_type, {})
@@ -85,7 +87,7 @@ def age_specific_rate(model,
     # mu_age 지정 없으면 spline 작성, 있으면 재활용
     if mu_age is None:
         vars.update(
-            dismod_mr.model.spline.spline(_data_type,
+            dismod_mr.model.spline.spline(data_type=_data_type,
                                           ages=ages,
                                           knots=knots,
                                           smoothing=smoothing,
@@ -101,11 +103,11 @@ def age_specific_rate(model,
     # 부모 패턴과의 유사성 prior 적용 (계층 모델)
     if mu_age_parent is not None:
         vars.update(
-            dismod_mr.model.priors.similar('parent_similarity_%s' % _data_type,
-                                           vars['mu_age'],
-                                           mu_age_parent,
-                                           sigma_age_parent,
-                                           0.)
+            dismod_mr.model.priors.similar(data_type='parent_similarity_%s' % _data_type,
+                                           mu_child=vars['mu_age'],
+                                           mu_parent=mu_age_parent,
+                                           sigma_parent=sigma_age_parent,
+                                           sigma_difference=0.)
         )
         # 초기 gamma 값 부모 mu 기반 설정
         if mu_age is None:
@@ -129,15 +131,15 @@ def age_specific_rate(model,
         # covariate 모델링 or interval mu 직접 사용
         if include_covariates:
             vars.update(
-                dismod_mr.model.covariates.mean_covariate_model(_data_type,
-                                                                 vars['mu_interval'],
-                                                                 data,
-                                                                 parameters,
-                                                                 model,
-                                                                 reference_area,
-                                                                 reference_sex,
-                                                                 reference_year,
-                                                                 zero_re=zero_re)
+                dismod_mr.model.covariates.mean_covariate_model(data_type=_data_type,
+                                                                mu=vars['mu_interval'],
+                                                                input_data=data,
+                                                                parameters=parameters,
+                                                                model=model,
+                                                                root_area=reference_area,
+                                                                root_sex=reference_sex,
+                                                                root_year=reference_year,
+                                                                zero_re=zero_re)
             )
         else:
             vars.update({'pi': vars['mu_interval']})
@@ -204,11 +206,11 @@ def age_specific_rate(model,
             vars['sigma'] = mc.Uniform(f'sigma_{_data_type}', lower=.0001, upper=1., value=.01)
             # log-normal likelihood
             vars.update(
-                dismod_mr.model.likelihood.log_normal(_data_type,
-                                                       vars['pi'],
-                                                       vars['sigma'],
-                                                       data['value'],
-                                                       data['standard_error'])
+                dismod_mr.model.likelihood.log_normal(data_type=_data_type,
+                                                       pi=vars['pi'],
+                                                       sigma=vars['sigma'],
+                                                       p=data['value'],
+                                                       s=data['standard_error'])
             )
 
         elif rate_type == 'normal':
